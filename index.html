@@ -8,9 +8,9 @@
     <meta name="apple-mobile-web-app-title" content="AI Aquarium" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>AI Aquarium</title>
-    <link rel="manifest" href="manifest.webmanifest?v=9" />
+    <link rel="manifest" href="manifest.webmanifest?v=10" />
     <link rel="apple-touch-icon" href="icon-180.png" />
-    <link rel="stylesheet" href="style.css?v=9" />
+    <link rel="stylesheet" href="style.css?v=10" />
   </head>
   <body>
     <main class="app">
@@ -32,32 +32,32 @@
             <div class="startTitle">PLAY SETUP</div>
             <div class="choiceGrid">
               <div class="choiceGroup">
-                <div class="choiceLabel">Device</div>
+                <div class="choiceLabel" data-i18n="device">Device</div>
                 <div class="deviceButtons" aria-label="play device">
-                  <button class="deviceBtn" type="button" data-device="phone">Play on Phone</button>
-                  <button class="deviceBtn" type="button" data-device="pc">Play on PC</button>
+                  <button class="deviceBtn" type="button" data-device="phone" data-i18n="phone">Play on Phone</button>
+                  <button class="deviceBtn" type="button" data-device="pc" data-i18n="pc">Play on PC</button>
                 </div>
               </div>
               <div class="choiceGroup">
-                <div class="choiceLabel">Level</div>
+                <div class="choiceLabel" data-i18n="level">Level</div>
                 <div class="levelButtons" aria-label="difficulty level">
-                  <button class="levelBtn" type="button" data-level="beginner">Beginner</button>
-                  <button class="levelBtn" type="button" data-level="middle">Normal</button>
-                  <button class="levelBtn" type="button" data-level="advanced">Advanced</button>
+                  <button class="levelBtn" type="button" data-level="beginner" data-i18n="beginner">Beginner</button>
+                  <button class="levelBtn" type="button" data-level="middle" data-i18n="normal">Normal</button>
+                  <button class="levelBtn" type="button" data-level="advanced" data-i18n="advanced">Advanced</button>
                 </div>
               </div>
             </div>
             <div class="actionButtons" aria-label="start actions">
-              <button id="startBtn" type="button">Start Game</button>
-              <button id="viewBtn" type="button">View Mode</button>
+              <button id="startBtn" type="button" data-i18n="start">Start Game</button>
+              <button id="viewBtn" type="button" data-i18n="view">View Mode</button>
             </div>
           </div>
         </div>
         <div id="viewActions" class="viewActions" hidden aria-label="view mode actions">
-          <button id="viewStartBtn" type="button">Start Game</button>
-          <button id="setupBtn" type="button">Setup</button>
+          <button id="viewStartBtn" type="button" data-i18n="start">Start Game</button>
+          <button id="setupBtn" type="button" data-i18n="setup">Setup</button>
         </div>
-        <button id="panelToggleBtn" class="panelToggleBtn" type="button" aria-controls="controlPanel" aria-expanded="false">Control</button>
+        <button id="panelToggleBtn" class="panelToggleBtn" type="button" aria-controls="controlPanel" aria-expanded="false" data-i18n="control">Control</button>
         <div id="touchControls" class="touchControls" hidden aria-label="diver joystick">
           <div id="joystickBase" class="joystickBase" role="application" aria-label="Slide to move the diver">
             <div id="joystickKnob" class="joystickKnob"></div>
@@ -66,66 +66,80 @@
         <div id="resultOverlay" class="resultOverlay" hidden>
           <div class="resultTitle">GAME OVER</div>
           <div class="resultScore" aria-live="polite"></div>
-          <button id="playAgainBtn" type="button">Play Again</button>
+          <button id="playAgainBtn" type="button" data-i18n="playAgain">Play Again</button>
         </div>
       </section>
 
       <aside id="controlPanel" class="panel" aria-label="simulation controls">
         <div class="panelHeader">
-          <p class="eyebrow">CONTROL</p>
+          <p class="eyebrow" data-i18n="control">CONTROL</p>
           <div class="panelActions">
-            <button id="panelCloseBtn" class="panelCloseBtn" type="button">Close</button>
-            <button id="resetBtn" type="button">Reset</button>
+            <button id="panelCloseBtn" class="panelCloseBtn" type="button" data-i18n="close">Close</button>
+            <button id="resetBtn" type="button" data-i18n="reset">Reset</button>
+            <button id="updateBtn" type="button" data-i18n="update">Update</button>
           </div>
         </div>
 
-                <label>
-          Small Fish <span id="smallValue">110</span>
+
+        <label class="languageControl">
+          <span data-i18n="language">Language</span>
+          <select id="languageSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+            <option value="zh">中文</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="si">සිංහල</option>
+          </select>
+        </label>
+
+        <label>
+          <span data-i18n="smallFish">Small Fish</span> <span id="smallValue">110</span>
           <input id="smallCount" type="range" min="0" max="200" value="110" />
         </label>
         <label>
-          Middle Fish <span id="middleValue">14</span>
+          <span data-i18n="middleFish">Middle Fish</span> <span id="middleValue">14</span>
           <input id="middleCount" type="range" min="0" max="60" value="14" />
         </label>
         <label>
-          Boss Fish <span id="bossValue">2</span>
+          <span data-i18n="bossFish">Boss Fish</span> <span id="bossValue">2</span>
           <input id="bossCount" type="range" min="0" max="12" value="2" />
         </label>
-        <div class="divider">Species</div>
+        <div class="divider" data-i18n="species">Species</div>
         <label>
-          Fish Shape <span id="fishShapeValue">45</span>
+          <span data-i18n="fishShape">Fish Shape</span> <span id="fishShapeValue">45</span>
           <input id="fishShapeCount" type="range" min="0" max="160" value="45" />
         </label>
         <label>
-          Ray <span id="rayValue">20</span>
+          <span data-i18n="ray">Ray</span> <span id="rayValue">20</span>
           <input id="rayCount" type="range" min="0" max="80" value="20" />
         </label>
         <label>
-          Octopus <span id="octopusValue">15</span>
+          <span data-i18n="octopus">Octopus</span> <span id="octopusValue">15</span>
           <input id="octopusCount" type="range" min="0" max="80" value="15" />
         </label>
         <label>
-          Squid <span id="squidValue">15</span>
+          <span data-i18n="squid">Squid</span> <span id="squidValue">15</span>
           <input id="squidCount" type="range" min="0" max="80" value="15" />
         </label>
         <label>
-          Mola <span id="molaValue">10</span>
+          <span data-i18n="mola">Mola</span> <span id="molaValue">10</span>
           <input id="molaCount" type="range" min="0" max="60" value="10" />
         </label>
         <label>
-          Alignment
+          <span data-i18n="alignment">Alignment</span>
           <input id="align" type="range" min="0" max="3" value="1.2" step="0.1" />
         </label>
         <label>
-          Cohesion
+          <span data-i18n="cohesion">Cohesion</span>
           <input id="cohesion" type="range" min="0" max="3" value="0.8" step="0.1" />
         </label>
         <label>
-          Separation
+          <span data-i18n="separation">Separation</span>
           <input id="separate" type="range" min="0" max="4" value="1.8" step="0.1" />
         </label>
         <label>
-          Speed
+          <span data-i18n="speed">Speed</span>
           <input id="speed" type="range" min="1" max="6" value="3.2" step="0.1" />
         </label>
 
@@ -138,16 +152,21 @@
       </aside>
     </main>
 
-    <script src="main.js?v=9"></script>
+    <script src="main.js?v=10"></script>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("service-worker.js?v=9");
+          navigator.serviceWorker.register("service-worker.js?v=10");
         });
       }
     </script>
   </body>
 </html>
+
+
+
+
+
 
 
 

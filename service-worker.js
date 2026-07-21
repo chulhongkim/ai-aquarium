@@ -1,10 +1,10 @@
-﻿const CACHE_NAME = "ai-aquarium-v9";
+﻿const CACHE_NAME = "ai-aquarium-v10";
 const ASSETS = [
   "./",
   "./index.html",
-  "./style.css?v=9",
-  "./main.js?v=9",
-  "./manifest.webmanifest?v=9",
+  "./style.css?v=10",
+  "./main.js?v=10",
+  "./manifest.webmanifest?v=10",
   "./icon.svg",
   "./icon-180.png",
   "./icon-512.png",
@@ -34,5 +34,6 @@ self.addEventListener("fetch", (event) => {
   }
   event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
 });
+
 
 

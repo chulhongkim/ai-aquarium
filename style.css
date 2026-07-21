@@ -439,6 +439,7 @@ h1 {
 }
 .panelActions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -470,6 +471,17 @@ input[type="range"] {
   grid-column: 1 / -1;
   accent-color: #66dcc9;
   width: 100%;
+}
+
+.languageControl select {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 38px;
+  border: 1px solid rgba(158, 231, 220, 0.34);
+  border-radius: 8px;
+  background: rgba(216, 251, 243, 0.92);
+  color: #092326;
+  font-weight: 850;
 }
 
 .legend {
@@ -657,6 +669,7 @@ input[type="range"] {
     top: max(12px, env(safe-area-inset-top));
   }
 }
+
 
 
 

@@ -23,6 +23,8 @@ const ui = {
   separate: document.querySelector("#separate"),
   speed: document.querySelector("#speed"),
   reset: document.querySelector("#resetBtn"),
+  update: document.querySelector("#updateBtn"),
+  language: document.querySelector("#languageSelect"),
   fishCount: document.querySelector("#fishCount"),
   fps: document.querySelector("#fps"),
   hint: document.querySelector("#hint"),
@@ -66,6 +68,19 @@ const winMessage = { active: false, timer: 0 };
 const shark = { x: 0, y: 0, vx: 2.4, vy: 0.2, size: 34, wiggle: 0, hunger: 0, fullness: 0, speedMood: 1, chasePower: 0.11, nextSpeedChangeAt: 0 };
 const SETTINGS_KEY = "ai-aquarium-slider-settings";
 const BEST_SCORE_KEY = "ai-aquarium-best-survival-score";
+const LANGUAGE_KEY = "ai-aquarium-language";
+const translations = {
+  en: { appLang: "en", control: "Control", close: "Close", reset: "Reset", update: "Update", language: "Language", device: "Device", phone: "Play on Phone", pc: "Play on PC", level: "Level", beginner: "Beginner", normal: "Normal", advanced: "Advanced", start: "Start Game", view: "View Mode", setup: "Setup", playAgain: "Play Again", smallFish: "Small Fish", middleFish: "Middle Fish", bossFish: "Boss Fish", species: "Species", fishShape: "Fish Shape", ray: "Ray", octopus: "Octopus", squid: "Squid", mola: "Mola", alignment: "Alignment", cohesion: "Cohesion", separation: "Separation", speed: "Speed", gameOver: "GAME OVER", survived: "SURVIVED!", newRecord: "NEW RECORD!", score: "Score", best: "Best", previous: "Previous", survival: "SURVIVAL", selectLevel: "SELECT LEVEL", diverIn: "DIVER IN", enterWater: "ENTER THE WATER", updating: "Updating..." },
+  ja: { appLang: "ja", control: "操作", close: "閉じる", reset: "リセット", update: "最新版", language: "言語", device: "端末", phone: "スマホで遊ぶ", pc: "PCで遊ぶ", level: "レベル", beginner: "かんたん", normal: "ふつう", advanced: "むずかしい", start: "ゲーム開始", view: "観察モード", setup: "設定", playAgain: "もう一回", smallFish: "小さい魚", middleFish: "中くらいの魚", bossFish: "大きい魚", species: "種類", fishShape: "魚型", ray: "エイ", octopus: "タコ", squid: "イカ", mola: "マンボウ", alignment: "向きを合わせる", cohesion: "集まる", separation: "離れる", speed: "速さ", gameOver: "ゲームオーバー", survived: "生きのびた!", newRecord: "新記録!", score: "スコア", best: "最高", previous: "前回", survival: "生存時間", selectLevel: "レベル選択", diverIn: "ダイバーまで", enterWater: "入水中", updating: "更新中..." },
+  zh: { appLang: "zh", control: "控制", close: "关闭", reset: "重置", update: "更新", language: "语言", device: "设备", phone: "手机游玩", pc: "电脑游玩", level: "等级", beginner: "简单", normal: "普通", advanced: "困难", start: "开始游戏", view: "观赏模式", setup: "设置", playAgain: "再玩一次", smallFish: "小鱼", middleFish: "中鱼", bossFish: "大鱼", species: "种类", fishShape: "鱼形", ray: "鳐鱼", octopus: "章鱼", squid: "鱿鱼", mola: "翻车鱼", alignment: "对齐", cohesion: "聚集", separation: "分散", speed: "速度", gameOver: "游戏结束", survived: "成功逃生!", newRecord: "新纪录!", score: "分数", best: "最高", previous: "上次", survival: "生存时间", selectLevel: "选择等级", diverIn: "潜水员倒计时", enterWater: "入水中", updating: "更新中..." },
+  es: { appLang: "es", control: "Control", close: "Cerrar", reset: "Reiniciar", update: "Actualizar", language: "Idioma", device: "Dispositivo", phone: "Jugar en móvil", pc: "Jugar en PC", level: "Nivel", beginner: "Fácil", normal: "Normal", advanced: "Difícil", start: "Empezar", view: "Modo vista", setup: "Ajustes", playAgain: "Otra vez", smallFish: "Peces pequeños", middleFish: "Peces medianos", bossFish: "Peces grandes", species: "Especies", fishShape: "Forma pez", ray: "Raya", octopus: "Pulpo", squid: "Calamar", mola: "Pez luna", alignment: "Alineación", cohesion: "Cohesión", separation: "Separación", speed: "Velocidad", gameOver: "FIN DEL JUEGO", survived: "SOBREVIVISTE!", newRecord: "NUEVO RÉCORD!", score: "Puntuación", best: "Mejor", previous: "Anterior", survival: "SUPERVIVENCIA", selectLevel: "ELIGE NIVEL", diverIn: "BUZO EN", enterWater: "ENTRANDO", updating: "Actualizando..." },
+  fr: { appLang: "fr", control: "Contrôle", close: "Fermer", reset: "Réinitialiser", update: "Mettre à jour", language: "Langue", device: "Appareil", phone: "Jouer sur mobile", pc: "Jouer sur PC", level: "Niveau", beginner: "Facile", normal: "Normal", advanced: "Difficile", start: "Démarrer", view: "Mode vue", setup: "Réglages", playAgain: "Rejouer", smallFish: "Petits poissons", middleFish: "Poissons moyens", bossFish: "Gros poissons", species: "Espèces", fishShape: "Forme poisson", ray: "Raie", octopus: "Poulpe", squid: "Calmar", mola: "Môle", alignment: "Alignement", cohesion: "Cohésion", separation: "Séparation", speed: "Vitesse", gameOver: "PARTIE TERMINÉE", survived: "SURVÉCU!", newRecord: "NOUVEAU RECORD!", score: "Score", best: "Meilleur", previous: "Précédent", survival: "SURVIE", selectLevel: "CHOISIR NIVEAU", diverIn: "PLONGEUR DANS", enterWater: "ENTRÉE DANS L'EAU", updating: "Mise à jour..." },
+  si: { appLang: "si", control: "පාලනය", close: "වසන්න", reset: "නැවත", update: "යාවත්කාල", language: "භාෂාව", device: "උපාංගය", phone: "දුරකථනයෙන්", pc: "PC එකෙන්", level: "මට්ටම", beginner: "ලේසි", normal: "සාමාන්‍ය", advanced: "අමාරු", start: "ආරම්භ කරන්න", view: "නරඹන මාදිලිය", setup: "සැකසුම්", playAgain: "නැවත සෙල්ලම්", smallFish: "කුඩා මාළු", middleFish: "මැද මාළු", bossFish: "ලොකු මාළු", species: "වර්ග", fishShape: "මාළු හැඩය", ray: "රේ", octopus: "ඔක්ටොපස්", squid: "ස්කුවිඩ්", mola: "මෝලා", alignment: "එක දිශාව", cohesion: "එකට රැස්වීම", separation: "වෙන්වීම", speed: "වේගය", gameOver: "ක්‍රීඩාව අවසන්", survived: "බේරුණා!", newRecord: "නව වාර්තාව!", score: "ලකුණු", best: "හොඳම", previous: "පෙර", survival: "බේරුණු කාලය", selectLevel: "මට්ටම තෝරන්න", diverIn: "කිමිදුම්කරු", enterWater: "ජලයට ඇතුල්", updating: "යාවත්කාලීන..." },
+};
+let currentLanguage = "en";
+function t(key) {
+  return translations[currentLanguage]?.[key] || translations.en[key] || key;
+}
 const sliderKeys = [
   "smallCount",
   "middleCount",
@@ -322,6 +337,49 @@ function usesOverlayPanel() {
   return window.matchMedia("(orientation: landscape) and (max-height: 560px) and (max-width: 980px)").matches;
 }
 
+function loadLanguage() {
+  try {
+    const saved = localStorage.getItem(LANGUAGE_KEY);
+    currentLanguage = translations[saved] ? saved : "en";
+  } catch (error) {
+    currentLanguage = "en";
+  }
+  if (ui.language) ui.language.value = currentLanguage;
+}
+
+function saveLanguage(language) {
+  currentLanguage = translations[language] ? language : "en";
+  try {
+    localStorage.setItem(LANGUAGE_KEY, currentLanguage);
+  } catch (error) {
+    // Keep the current language for this session when storage is unavailable.
+  }
+}
+
+function applyLanguage() {
+  document.documentElement.lang = t("appLang");
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    const key = element.dataset.i18n;
+    element.textContent = t(key);
+  });
+  updateStartControls();
+}
+
+async function updateToLatest() {
+  if (ui.update) ui.update.textContent = t("updating");
+  try {
+    if ("serviceWorker" in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((registration) => registration.update()));
+    }
+    if ("caches" in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.filter((key) => key.startsWith("ai-aquarium-")).map((key) => caches.delete(key)));
+    }
+  } finally {
+    window.location.reload();
+  }
+}
 function setPanelOpen(open) {
   if (!ui.panel) return;
   const shouldOpen = open && usesOverlayPanel();
@@ -508,7 +566,7 @@ function reset(showStart = true) {
   stopAquariumBgm();
   winMessage.active = false;
   winMessage.timer = 0;
-  if (ui.resultTitle) ui.resultTitle.textContent = "GAME OVER";
+  if (ui.resultTitle) ui.resultTitle.textContent = t("gameOver");
   if (ui.resultScore) {
     ui.resultScore.textContent = "";
     ui.resultScore.classList.remove("record", "standard");
@@ -1507,9 +1565,9 @@ function buildResultScore(result) {
   const isRecord = score > previousBest;
   if (isRecord) writeBestScore(score);
   const best = Math.max(score, previousBest);
-  const title = result === "gameover" && isRecord ? "NEW RECORD!" : result === "gameover" ? "GAME OVER" : "SURVIVED!";
-  const detail = isRecord ? `Previous ${formatSeconds(previousBest)}` : `Best ${formatSeconds(best)}`;
-  return { title, score, isRecord, html: `<span class="scoreLabel">Score</span><strong>${formatSeconds(score)}</strong><span>${detail}</span>` };
+  const title = result === "gameover" && isRecord ? t("newRecord") : result === "gameover" ? t("gameOver") : t("survived");
+  const detail = isRecord ? `${t("previous")} ${formatSeconds(previousBest)}` : `${t("best")} ${formatSeconds(best)}`;
+  return { title, score, isRecord, html: `<span class="scoreLabel">${t("score")}</span><strong>${formatSeconds(score)}</strong><span>${detail}</span>` };
 }
 
 function showResult(result) {
@@ -1548,19 +1606,19 @@ function updateWinMessage() {
 
 function drawGameTimer() {
   if (gameState.mode === "view") return;
-  let label = gameState.started ? "DIVER IN 5" : "SELECT LEVEL";
+  let label = gameState.started ? `${t("diverIn")} 5` : t("selectLevel");
   let seconds = null;
 
   if (diver.active && diver.entered) {
     seconds = survivalSeconds();
     label = formatSeconds(seconds);
   } else if (diver.active) {
-    label = "ENTER THE WATER";
+    label = t("enterWater");
   } else if (!gameState.started) {
-    label = "SELECT LEVEL";
+    label = t("selectLevel");
   } else if (!gameState.over) {
     seconds = Math.max(0, Math.ceil((diver.spawnAt - diver.timer) / 60));
-    label = `DIVER IN ${seconds}`;
+    label = `${t("diverIn")} ${seconds}`;
   } else if (gameState.result === "gameover") {
     label = formatSeconds(survivalSeconds());
   }
@@ -1577,7 +1635,7 @@ function drawGameTimer() {
   ctx.stroke();
   ctx.fillStyle = "rgba(190, 239, 231, 0.88)";
   ctx.font = "800 11px Segoe UI, sans-serif";
-  const timerTitle = gameState.started ? `SURVIVAL / ${difficultyLevels[gameState.level].label}` : "SELECT LEVEL";
+  const timerTitle = gameState.started ? `${t("survival")} / ${difficultyLevels[gameState.level].label}` : t("selectLevel");
   ctx.fillText(timerTitle, width / 2, 36);
   ctx.fillStyle = "#f8fffb";
   ctx.font = label.length > 8 ? "900 18px Segoe UI, sans-serif" : "900 28px Segoe UI, sans-serif";
@@ -1595,7 +1653,7 @@ function drawWinMessage() {
   ctx.font = `900 ${Math.min(92, Math.max(44, width * 0.09))}px Segoe UI, sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  const message = gameState.result === "gameover" ? "GAME OVER" : "SURVIVED!";
+  const message = gameState.result === "gameover" ? t("gameOver") : t("survived");
   ctx.strokeText(message, width / 2, height * 0.42);
   ctx.fillText(message, width / 2, height * 0.42);
   ctx.restore();
@@ -1707,6 +1765,11 @@ window.addEventListener("keyup", (event) => {
 
 ui.reset.addEventListener("click", () => reset(true));
 if (ui.playAgain) ui.playAgain.addEventListener("click", () => reset(true));
+if (ui.update) ui.update.addEventListener("click", updateToLatest);
+if (ui.language) ui.language.addEventListener("change", () => {
+  saveLanguage(ui.language.value);
+  applyLanguage();
+});
 ui.deviceButtons.forEach((button) => {
   button.addEventListener("click", () => {
     gameState.device = button.dataset.device || "pc";
@@ -1799,10 +1862,16 @@ if (ui.joystickBase) {
 window.addEventListener("resize", resize);
 
 loadSettings();
+loadLanguage();
+applyLanguage();
 connectSettingPersistence();
 resize();
 reset();
 requestAnimationFrame(loop);
+
+
+
+
 
 
 
