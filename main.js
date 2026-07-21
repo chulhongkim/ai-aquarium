@@ -1596,12 +1596,33 @@ if (ui.start) ui.start.addEventListener("click", startGame);
 if (ui.viewStart) ui.viewStart.addEventListener("click", startGame);
 if (ui.view) ui.view.addEventListener("click", startViewMode);
 if (ui.setup) ui.setup.addEventListener("click", () => reset(true));
+function togglePanel(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  setPanelOpen(!ui.panel.classList.contains("open"));
+}
+
+function closePanel(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  setPanelOpen(false);
+}
+
 if (ui.panelToggle) {
-  ui.panelToggle.addEventListener("click", () => setPanelOpen(!ui.panel.classList.contains("open")));
+  ui.panelToggle.addEventListener("pointerdown", togglePanel);
 }
 if (ui.panelClose) {
-  ui.panelClose.addEventListener("click", () => setPanelOpen(false));
+  ui.panelClose.addEventListener("pointerdown", closePanel);
 }
+if (ui.panel) {
+  ui.panel.addEventListener("pointerdown", (event) => event.stopPropagation());
+}
+window.addEventListener("pointerdown", (event) => {
+  if (!ui.panel || !ui.panel.classList.contains("open")) return;
+  if (event.target === ui.panelToggle) return;
+  if (ui.panel.contains(event.target)) return;
+  setPanelOpen(false);
+});
 function updateJoystick(event) {
   if (!ui.joystickBase || !ui.joystickKnob) return;
   const rect = ui.joystickBase.getBoundingClientRect();
