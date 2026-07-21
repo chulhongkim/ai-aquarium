@@ -8,9 +8,9 @@
     <meta name="apple-mobile-web-app-title" content="AI Aquarium" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>AI Aquarium</title>
-    <link rel="manifest" href="manifest.webmanifest?v=12" />
+    <link rel="manifest" href="manifest.webmanifest?v=13" />
     <link rel="apple-touch-icon" href="icon-180.png" />
-    <link rel="stylesheet" href="style.css?v=12" />
+    <link rel="stylesheet" href="style.css?v=13" />
   </head>
   <body>
     <main class="app">
@@ -24,6 +24,7 @@
           <div class="metrics">
             <span><strong id="fishCount">0</strong> fish</span>
             <span><strong id="fps">0</strong> fps</span>
+            <span class="versionBadge">v13</span>
           </div>
         </div>
         <div id="hint" class="hint">Choose a device and level to start</div>
@@ -167,16 +168,17 @@
       </aside>
     </main>
 
-    <script src="main.js?v=12"></script>
+    <script src="main.js?v=13"></script>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("service-worker.js?v=12");
+          navigator.serviceWorker.register("service-worker.js?v=13");
         });
       }
     </script>
   </body>
 </html>
+
 
 
 

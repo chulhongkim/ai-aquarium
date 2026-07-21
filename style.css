@@ -76,6 +76,12 @@ h1 {
   padding: 8px 10px;
 }
 
+.metrics .versionBadge {
+  border-color: rgba(255, 246, 110, 0.42);
+  color: #fff66f;
+  font-weight: 950;
+}
+
 .hint {
   display: none;
 }
@@ -784,6 +790,7 @@ input[type="range"] {
     top: max(12px, env(safe-area-inset-top));
   }
 }
+
 
 
 
