@@ -8,9 +8,9 @@
     <meta name="apple-mobile-web-app-title" content="AI Aquarium" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>AI Aquarium</title>
-    <link rel="manifest" href="manifest.webmanifest?v=10" />
+    <link rel="manifest" href="manifest.webmanifest?v=11" />
     <link rel="apple-touch-icon" href="icon-180.png" />
-    <link rel="stylesheet" href="style.css?v=10" />
+    <link rel="stylesheet" href="style.css?v=11" />
   </head>
   <body>
     <main class="app">
@@ -50,7 +50,22 @@
             <div class="actionButtons" aria-label="start actions">
               <button id="startBtn" type="button" data-i18n="start">Start Game</button>
               <button id="viewBtn" type="button" data-i18n="view">View Mode</button>
+              <button id="howToBtn" type="button" data-i18n="howTo">How to Play</button>
             </div>
+          </div>
+        </div>
+        <div id="howToOverlay" class="howToOverlay" hidden>
+          <div class="howToPanel" role="dialog" aria-modal="true" aria-labelledby="howToTitle">
+            <div class="howToHeader">
+              <h2 id="howToTitle" data-i18n="howTo">How to Play</h2>
+              <button id="howToCloseBtn" type="button" data-i18n="close">Close</button>
+            </div>
+            <ul>
+              <li data-i18n="howToMove">Move the diver and run away from the shark.</li>
+              <li data-i18n="howToSchool">Hide inside a school of fish to confuse the shark.</li>
+              <li data-i18n="howToScore">The longer you survive, the higher your score.</li>
+              <li data-i18n="howToRecord">Beat your best time to get a new record.</li>
+            </ul>
           </div>
         </div>
         <div id="viewActions" class="viewActions" hidden aria-label="view mode actions">
@@ -152,16 +167,19 @@
       </aside>
     </main>
 
-    <script src="main.js?v=10"></script>
+    <script src="main.js?v=11"></script>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("service-worker.js?v=10");
+          navigator.serviceWorker.register("service-worker.js?v=11");
         });
       }
     </script>
   </body>
 </html>
+
+
+
 
 
 

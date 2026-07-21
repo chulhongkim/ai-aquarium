@@ -224,6 +224,7 @@ h1 {
 .levelBtn,
 #startBtn,
 #viewBtn,
+#howToBtn,
 #playAgainBtn {
   min-width: 132px;
   height: 48px;
@@ -253,6 +254,60 @@ h1 {
 }
 
 
+.howToOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  background: rgba(3, 15, 18, 0.68);
+}
+
+.howToOverlay[hidden] {
+  display: none;
+}
+
+.howToPanel {
+  display: grid;
+  width: min(640px, 92vw);
+  gap: 18px;
+  padding: clamp(20px, 4vw, 36px);
+  border: 3px solid rgba(255, 246, 250, 0.9);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 246, 110, 0.24), transparent 30%),
+    radial-gradient(circle at 84% 18%, rgba(255, 82, 184, 0.22), transparent 32%),
+    rgba(5, 28, 32, 0.94);
+  box-shadow: 0 0 44px rgba(255, 82, 184, 0.32), 0 0 70px rgba(0, 238, 255, 0.2);
+  color: #f8fffb;
+  text-align: left;
+}
+
+.howToHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.howToHeader h2 {
+  margin: 0;
+  color: #fff66f;
+  font-size: clamp(28px, 6vw, 54px);
+  line-height: 0.95;
+  text-shadow: 0 4px 0 #ff52b8, 0 0 28px rgba(255, 246, 110, 0.7);
+}
+
+.howToPanel ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding-left: 1.4em;
+  font-size: clamp(18px, 3.2vw, 26px);
+  font-weight: 850;
+  line-height: 1.35;
+}
 .viewActions {
   position: absolute;
   right: 24px;
@@ -664,11 +719,66 @@ input[type="range"] {
     color: #d8fbf3;
   }
 
-  .viewActions {
+  .howToOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  background: rgba(3, 15, 18, 0.68);
+}
+
+.howToOverlay[hidden] {
+  display: none;
+}
+
+.howToPanel {
+  display: grid;
+  width: min(640px, 92vw);
+  gap: 18px;
+  padding: clamp(20px, 4vw, 36px);
+  border: 3px solid rgba(255, 246, 250, 0.9);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 246, 110, 0.24), transparent 30%),
+    radial-gradient(circle at 84% 18%, rgba(255, 82, 184, 0.22), transparent 32%),
+    rgba(5, 28, 32, 0.94);
+  box-shadow: 0 0 44px rgba(255, 82, 184, 0.32), 0 0 70px rgba(0, 238, 255, 0.2);
+  color: #f8fffb;
+  text-align: left;
+}
+
+.howToHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.howToHeader h2 {
+  margin: 0;
+  color: #fff66f;
+  font-size: clamp(28px, 6vw, 54px);
+  line-height: 0.95;
+  text-shadow: 0 4px 0 #ff52b8, 0 0 28px rgba(255, 246, 110, 0.7);
+}
+
+.howToPanel ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding-left: 1.4em;
+  font-size: clamp(18px, 3.2vw, 26px);
+  font-weight: 850;
+  line-height: 1.35;
+}
+.viewActions {
     right: max(112px, calc(env(safe-area-inset-right) + 112px));
     top: max(12px, env(safe-area-inset-top));
   }
 }
+
 
 
 

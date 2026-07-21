@@ -33,6 +33,9 @@ const ui = {
   levelButtons: document.querySelectorAll(".levelBtn"),
   start: document.querySelector("#startBtn"),
   view: document.querySelector("#viewBtn"),
+  howTo: document.querySelector("#howToBtn"),
+  howToOverlay: document.querySelector("#howToOverlay"),
+  howToClose: document.querySelector("#howToCloseBtn"),
   viewActions: document.querySelector("#viewActions"),
   viewStart: document.querySelector("#viewStartBtn"),
   setup: document.querySelector("#setupBtn"),
@@ -70,12 +73,12 @@ const SETTINGS_KEY = "ai-aquarium-slider-settings";
 const BEST_SCORE_KEY = "ai-aquarium-best-survival-score";
 const LANGUAGE_KEY = "ai-aquarium-language";
 const translations = {
-  en: { appLang: "en", control: "Control", close: "Close", reset: "Reset", update: "Update", language: "Language", device: "Device", phone: "Play on Phone", pc: "Play on PC", level: "Level", beginner: "Beginner", normal: "Normal", advanced: "Advanced", start: "Start Game", view: "View Mode", setup: "Setup", playAgain: "Play Again", smallFish: "Small Fish", middleFish: "Middle Fish", bossFish: "Boss Fish", species: "Species", fishShape: "Fish Shape", ray: "Ray", octopus: "Octopus", squid: "Squid", mola: "Mola", alignment: "Alignment", cohesion: "Cohesion", separation: "Separation", speed: "Speed", gameOver: "GAME OVER", survived: "SURVIVED!", newRecord: "NEW RECORD!", score: "Score", best: "Best", previous: "Previous", survival: "SURVIVAL", selectLevel: "SELECT LEVEL", diverIn: "DIVER IN", enterWater: "ENTER THE WATER", updating: "Updating..." },
-  ja: { appLang: "ja", control: "操作", close: "閉じる", reset: "リセット", update: "最新版", language: "言語", device: "端末", phone: "スマホで遊ぶ", pc: "PCで遊ぶ", level: "レベル", beginner: "かんたん", normal: "ふつう", advanced: "むずかしい", start: "ゲーム開始", view: "観察モード", setup: "設定", playAgain: "もう一回", smallFish: "小さい魚", middleFish: "中くらいの魚", bossFish: "大きい魚", species: "種類", fishShape: "魚型", ray: "エイ", octopus: "タコ", squid: "イカ", mola: "マンボウ", alignment: "向きを合わせる", cohesion: "集まる", separation: "離れる", speed: "速さ", gameOver: "ゲームオーバー", survived: "生きのびた!", newRecord: "新記録!", score: "スコア", best: "最高", previous: "前回", survival: "生存時間", selectLevel: "レベル選択", diverIn: "ダイバーまで", enterWater: "入水中", updating: "更新中..." },
-  zh: { appLang: "zh", control: "控制", close: "关闭", reset: "重置", update: "更新", language: "语言", device: "设备", phone: "手机游玩", pc: "电脑游玩", level: "等级", beginner: "简单", normal: "普通", advanced: "困难", start: "开始游戏", view: "观赏模式", setup: "设置", playAgain: "再玩一次", smallFish: "小鱼", middleFish: "中鱼", bossFish: "大鱼", species: "种类", fishShape: "鱼形", ray: "鳐鱼", octopus: "章鱼", squid: "鱿鱼", mola: "翻车鱼", alignment: "对齐", cohesion: "聚集", separation: "分散", speed: "速度", gameOver: "游戏结束", survived: "成功逃生!", newRecord: "新纪录!", score: "分数", best: "最高", previous: "上次", survival: "生存时间", selectLevel: "选择等级", diverIn: "潜水员倒计时", enterWater: "入水中", updating: "更新中..." },
-  es: { appLang: "es", control: "Control", close: "Cerrar", reset: "Reiniciar", update: "Actualizar", language: "Idioma", device: "Dispositivo", phone: "Jugar en móvil", pc: "Jugar en PC", level: "Nivel", beginner: "Fácil", normal: "Normal", advanced: "Difícil", start: "Empezar", view: "Modo vista", setup: "Ajustes", playAgain: "Otra vez", smallFish: "Peces pequeños", middleFish: "Peces medianos", bossFish: "Peces grandes", species: "Especies", fishShape: "Forma pez", ray: "Raya", octopus: "Pulpo", squid: "Calamar", mola: "Pez luna", alignment: "Alineación", cohesion: "Cohesión", separation: "Separación", speed: "Velocidad", gameOver: "FIN DEL JUEGO", survived: "SOBREVIVISTE!", newRecord: "NUEVO RÉCORD!", score: "Puntuación", best: "Mejor", previous: "Anterior", survival: "SUPERVIVENCIA", selectLevel: "ELIGE NIVEL", diverIn: "BUZO EN", enterWater: "ENTRANDO", updating: "Actualizando..." },
-  fr: { appLang: "fr", control: "Contrôle", close: "Fermer", reset: "Réinitialiser", update: "Mettre à jour", language: "Langue", device: "Appareil", phone: "Jouer sur mobile", pc: "Jouer sur PC", level: "Niveau", beginner: "Facile", normal: "Normal", advanced: "Difficile", start: "Démarrer", view: "Mode vue", setup: "Réglages", playAgain: "Rejouer", smallFish: "Petits poissons", middleFish: "Poissons moyens", bossFish: "Gros poissons", species: "Espèces", fishShape: "Forme poisson", ray: "Raie", octopus: "Poulpe", squid: "Calmar", mola: "Môle", alignment: "Alignement", cohesion: "Cohésion", separation: "Séparation", speed: "Vitesse", gameOver: "PARTIE TERMINÉE", survived: "SURVÉCU!", newRecord: "NOUVEAU RECORD!", score: "Score", best: "Meilleur", previous: "Précédent", survival: "SURVIE", selectLevel: "CHOISIR NIVEAU", diverIn: "PLONGEUR DANS", enterWater: "ENTRÉE DANS L'EAU", updating: "Mise à jour..." },
-  si: { appLang: "si", control: "පාලනය", close: "වසන්න", reset: "නැවත", update: "යාවත්කාල", language: "භාෂාව", device: "උපාංගය", phone: "දුරකථනයෙන්", pc: "PC එකෙන්", level: "මට්ටම", beginner: "ලේසි", normal: "සාමාන්‍ය", advanced: "අමාරු", start: "ආරම්භ කරන්න", view: "නරඹන මාදිලිය", setup: "සැකසුම්", playAgain: "නැවත සෙල්ලම්", smallFish: "කුඩා මාළු", middleFish: "මැද මාළු", bossFish: "ලොකු මාළු", species: "වර්ග", fishShape: "මාළු හැඩය", ray: "රේ", octopus: "ඔක්ටොපස්", squid: "ස්කුවිඩ්", mola: "මෝලා", alignment: "එක දිශාව", cohesion: "එකට රැස්වීම", separation: "වෙන්වීම", speed: "වේගය", gameOver: "ක්‍රීඩාව අවසන්", survived: "බේරුණා!", newRecord: "නව වාර්තාව!", score: "ලකුණු", best: "හොඳම", previous: "පෙර", survival: "බේරුණු කාලය", selectLevel: "මට්ටම තෝරන්න", diverIn: "කිමිදුම්කරු", enterWater: "ජලයට ඇතුල්", updating: "යාවත්කාලීන..." },
+  en: { appLang: "en", control: "Control", close: "Close", reset: "Reset", update: "Update", language: "Language", device: "Device", phone: "Play on Phone", pc: "Play on PC", level: "Level", beginner: "Beginner", normal: "Normal", advanced: "Advanced", start: "Start Game", view: "View Mode", setup: "Setup", playAgain: "Play Again", smallFish: "Small Fish", middleFish: "Middle Fish", bossFish: "Boss Fish", species: "Species", fishShape: "Fish Shape", ray: "Ray", octopus: "Octopus", squid: "Squid", mola: "Mola", alignment: "Alignment", cohesion: "Cohesion", separation: "Separation", speed: "Speed", gameOver: "GAME OVER", survived: "SURVIVED!", newRecord: "NEW RECORD!", score: "Score", best: "Best", previous: "Previous", survival: "SURVIVAL", selectLevel: "SELECT LEVEL", diverIn: "DIVER IN", enterWater: "ENTER THE WATER", updating: "Updating...", howTo: "How to Play", howToMove: "Move the diver and run away from the shark.", howToSchool: "Hide inside a school of fish to confuse the shark.", howToScore: "The longer you survive, the higher your score.", howToRecord: "Beat your best time to get a new record." },
+  ja: { appLang: "ja", control: "操作", close: "閉じる", reset: "リセット", update: "最新版", language: "言語", device: "端末", phone: "スマホで遊ぶ", pc: "PCで遊ぶ", level: "レベル", beginner: "かんたん", normal: "ふつう", advanced: "むずかしい", start: "ゲーム開始", view: "観察モード", setup: "設定", playAgain: "もう一回", smallFish: "小さい魚", middleFish: "中くらいの魚", bossFish: "大きい魚", species: "種類", fishShape: "魚型", ray: "エイ", octopus: "タコ", squid: "イカ", mola: "マンボウ", alignment: "向きを合わせる", cohesion: "集まる", separation: "離れる", speed: "速さ", gameOver: "ゲームオーバー", survived: "生きのびた!", newRecord: "新記録!", score: "スコア", best: "最高", previous: "前回", survival: "生存時間", selectLevel: "レベル選択", diverIn: "ダイバーまで", enterWater: "入水中", updating: "更新中...", howTo: "遊び方", howToMove: "ダイバーを動かしてサメから逃げる。", howToSchool: "魚の群れに紛れるとサメが混乱する。", howToScore: "長く逃げるほどスコアが高くなる。", howToRecord: "最高記録を超えると新記録になる。" },
+  zh: { appLang: "zh", control: "控制", close: "关闭", reset: "重置", update: "更新", language: "语言", device: "设备", phone: "手机游玩", pc: "电脑游玩", level: "等级", beginner: "简单", normal: "普通", advanced: "困难", start: "开始游戏", view: "观赏模式", setup: "设置", playAgain: "再玩一次", smallFish: "小鱼", middleFish: "中鱼", bossFish: "大鱼", species: "种类", fishShape: "鱼形", ray: "鳐鱼", octopus: "章鱼", squid: "鱿鱼", mola: "翻车鱼", alignment: "对齐", cohesion: "聚集", separation: "分散", speed: "速度", gameOver: "游戏结束", survived: "成功逃生!", newRecord: "新纪录!", score: "分数", best: "最高", previous: "上次", survival: "生存时间", selectLevel: "选择等级", diverIn: "潜水员倒计时", enterWater: "入水中", updating: "更新中...", howTo: "玩法", howToMove: "移动潜水员，躲开鲨鱼。", howToSchool: "藏进鱼群可以迷惑鲨鱼。", howToScore: "生存越久，分数越高。", howToRecord: "超过最佳时间就会刷新纪录。" },
+  es: { appLang: "es", control: "Control", close: "Cerrar", reset: "Reiniciar", update: "Actualizar", language: "Idioma", device: "Dispositivo", phone: "Jugar en móvil", pc: "Jugar en PC", level: "Nivel", beginner: "Fácil", normal: "Normal", advanced: "Difícil", start: "Empezar", view: "Modo vista", setup: "Ajustes", playAgain: "Otra vez", smallFish: "Peces pequeños", middleFish: "Peces medianos", bossFish: "Peces grandes", species: "Especies", fishShape: "Forma pez", ray: "Raya", octopus: "Pulpo", squid: "Calamar", mola: "Pez luna", alignment: "Alineación", cohesion: "Cohesión", separation: "Separación", speed: "Velocidad", gameOver: "FIN DEL JUEGO", survived: "SOBREVIVISTE!", newRecord: "NUEVO RÉCORD!", score: "Puntuación", best: "Mejor", previous: "Anterior", survival: "SUPERVIVENCIA", selectLevel: "ELIGE NIVEL", diverIn: "BUZO EN", enterWater: "ENTRANDO", updating: "Actualizando...", howTo: "Cómo jugar", howToMove: "Mueve al buzo y escapa del tiburón.", howToSchool: "Escóndete entre los peces para confundir al tiburón.", howToScore: "Cuanto más sobrevivas, mayor será tu puntuación.", howToRecord: "Supera tu mejor tiempo para lograr un récord." },
+  fr: { appLang: "fr", control: "Contrôle", close: "Fermer", reset: "Réinitialiser", update: "Mettre à jour", language: "Langue", device: "Appareil", phone: "Jouer sur mobile", pc: "Jouer sur PC", level: "Niveau", beginner: "Facile", normal: "Normal", advanced: "Difficile", start: "Démarrer", view: "Mode vue", setup: "Réglages", playAgain: "Rejouer", smallFish: "Petits poissons", middleFish: "Poissons moyens", bossFish: "Gros poissons", species: "Espèces", fishShape: "Forme poisson", ray: "Raie", octopus: "Poulpe", squid: "Calmar", mola: "Môle", alignment: "Alignement", cohesion: "Cohésion", separation: "Séparation", speed: "Vitesse", gameOver: "PARTIE TERMINÉE", survived: "SURVÉCU!", newRecord: "NOUVEAU RECORD!", score: "Score", best: "Meilleur", previous: "Précédent", survival: "SURVIE", selectLevel: "CHOISIR NIVEAU", diverIn: "PLONGEUR DANS", enterWater: "ENTRÉE DANS L'EAU", updating: "Mise à jour...", howTo: "Comment jouer", howToMove: "Déplace le plongeur et échappe au requin.", howToSchool: "Cache-toi dans le banc de poissons pour troubler le requin.", howToScore: "Plus tu survis longtemps, plus ton score augmente.", howToRecord: "Dépasse ton meilleur temps pour faire un record." },
+  si: { appLang: "si", control: "පාලනය", close: "වසන්න", reset: "නැවත", update: "යාවත්කාල", language: "භාෂාව", device: "උපාංගය", phone: "දුරකථනයෙන්", pc: "PC එකෙන්", level: "මට්ටම", beginner: "ලේසි", normal: "සාමාන්‍ය", advanced: "අමාරු", start: "ආරම්භ කරන්න", view: "නරඹන මාදිලිය", setup: "සැකසුම්", playAgain: "නැවත සෙල්ලම්", smallFish: "කුඩා මාළු", middleFish: "මැද මාළු", bossFish: "ලොකු මාළු", species: "වර්ග", fishShape: "මාළු හැඩය", ray: "රේ", octopus: "ඔක්ටොපස්", squid: "ස්කුවිඩ්", mola: "මෝලා", alignment: "එක දිශාව", cohesion: "එකට රැස්වීම", separation: "වෙන්වීම", speed: "වේගය", gameOver: "ක්‍රීඩාව අවසන්", survived: "බේරුණා!", newRecord: "නව වාර්තාව!", score: "ලකුණු", best: "හොඳම", previous: "පෙර", survival: "බේරුණු කාලය", selectLevel: "මට්ටම තෝරන්න", diverIn: "කිමිදුම්කරු", enterWater: "ජලයට ඇතුල්", updating: "යාවත්කාලීන...", howTo: "ක්‍රීඩා කරන හැටි", howToMove: "කිමිදුම්කරුවා ගෙන ගොස් මෝරාගෙන් පලා යන්න.", howToSchool: "මාළු රංචුව තුළ සැඟවුණොත් මෝරා ව්‍යාකූල වේ.", howToScore: "වැඩි වේලාවක් බේරුණොත් ලකුණු වැඩි වේ.", howToRecord: "හොඳම කාලය ඉක්මවා නව වාර්තාවක් ගන්න." },
 };
 let currentLanguage = "en";
 function t(key) {
@@ -593,6 +596,9 @@ function updateStartControls() {
     else if (gameState.device === "phone") ui.hint.textContent = "slide joystick: diver / tap aquarium: feed";
     else ui.hint.textContent = "arrow keys: diver / click: feed";
   }
+}
+function setHowToOpen(open) {
+  if (ui.howToOverlay) ui.howToOverlay.hidden = !open;
 }
 function startGame() {
   gameState.mode = "game";
@@ -1749,6 +1755,7 @@ canvas.addEventListener("click", (event) => {
 
 
 window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") setHowToOpen(false);
   if (event.key in keys) {
     keys[event.key] = true;
     startAquariumBgm();
@@ -1785,6 +1792,13 @@ ui.levelButtons.forEach((button) => {
 if (ui.start) ui.start.addEventListener("click", startGame);
 if (ui.viewStart) ui.viewStart.addEventListener("click", startGame);
 if (ui.view) ui.view.addEventListener("click", startViewMode);
+if (ui.howTo) ui.howTo.addEventListener("click", () => setHowToOpen(true));
+if (ui.howToClose) ui.howToClose.addEventListener("click", () => setHowToOpen(false));
+if (ui.howToOverlay) {
+  ui.howToOverlay.addEventListener("click", (event) => {
+    if (event.target === ui.howToOverlay) setHowToOpen(false);
+  });
+}
 if (ui.setup) ui.setup.addEventListener("click", () => reset(true));
 function togglePanel(event) {
   event.preventDefault();
@@ -1868,6 +1882,9 @@ connectSettingPersistence();
 resize();
 reset();
 requestAnimationFrame(loop);
+
+
+
 
 
 
