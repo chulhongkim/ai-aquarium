@@ -1,0 +1,25 @@
+﻿{
+  "name": "AI Aquarium",
+  "short_name": "Aquarium",
+  "description": "A touch-friendly aquarium survival game.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#071316",
+  "theme_color": "#071316",
+  "icons": [
+    {
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

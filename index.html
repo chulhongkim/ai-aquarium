@@ -1,0 +1,145 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071316" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="AI Aquarium" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>AI Aquarium</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="icon-180.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="stage" aria-label="AI aquarium simulation">
+        <canvas id="aquarium"></canvas>
+        <div class="hud">
+          <div>
+            <p class="eyebrow">BOIDS LAB</p>
+            <h1>AI Aquarium</h1>
+          </div>
+          <div class="metrics">
+            <span><strong id="fishCount">0</strong> fish</span>
+            <span><strong id="fps">0</strong> fps</span>
+          </div>
+        </div>
+        <div id="hint" class="hint">Choose a device and level to start</div>
+        <div id="startOverlay" class="startOverlay">
+          <div class="startTitle">PLAY SETUP</div>
+          <div class="choiceGroup">
+            <div class="choiceLabel">Device</div>
+            <div class="deviceButtons" aria-label="play device">
+              <button class="deviceBtn" type="button" data-device="phone">Play on Phone</button>
+              <button class="deviceBtn" type="button" data-device="pc">Play on PC</button>
+            </div>
+          </div>
+          <div class="choiceGroup">
+            <div class="choiceLabel">Level</div>
+            <div class="levelButtons" aria-label="difficulty level">
+              <button class="levelBtn" type="button" data-level="beginner">Beginner</button>
+              <button class="levelBtn" type="button" data-level="middle">Normal</button>
+              <button class="levelBtn" type="button" data-level="advanced">Advanced</button>
+            </div>
+          </div>
+          <button id="startBtn" type="button">Start Game</button>
+        </div>
+        <div id="touchControls" class="touchControls" hidden aria-label="diver joystick">
+          <div id="joystickBase" class="joystickBase" role="application" aria-label="Slide to move the diver">
+            <div id="joystickKnob" class="joystickKnob"></div>
+          </div>
+        </div>
+        <div id="resultOverlay" class="resultOverlay" hidden>
+          <div class="resultTitle">YOU WIN!</div>
+          <button id="playAgainBtn" type="button">Play Again</button>
+        </div>
+      </section>
+
+      <aside class="panel" aria-label="simulation controls">
+        <div class="panelHeader">
+          <p class="eyebrow">CONTROL</p>
+          <button id="resetBtn" type="button">Reset</button>
+        </div>
+
+                <label>
+          Small Fish <span id="smallValue">110</span>
+          <input id="smallCount" type="range" min="0" max="200" value="110" />
+        </label>
+        <label>
+          Middle Fish <span id="middleValue">14</span>
+          <input id="middleCount" type="range" min="0" max="60" value="14" />
+        </label>
+        <label>
+          Boss Fish <span id="bossValue">2</span>
+          <input id="bossCount" type="range" min="0" max="12" value="2" />
+        </label>
+        <div class="divider">Species</div>
+        <label>
+          Fish Shape <span id="fishShapeValue">45</span>
+          <input id="fishShapeCount" type="range" min="0" max="160" value="45" />
+        </label>
+        <label>
+          Ray <span id="rayValue">20</span>
+          <input id="rayCount" type="range" min="0" max="80" value="20" />
+        </label>
+        <label>
+          Octopus <span id="octopusValue">15</span>
+          <input id="octopusCount" type="range" min="0" max="80" value="15" />
+        </label>
+        <label>
+          Squid <span id="squidValue">15</span>
+          <input id="squidCount" type="range" min="0" max="80" value="15" />
+        </label>
+        <label>
+          Mola <span id="molaValue">10</span>
+          <input id="molaCount" type="range" min="0" max="60" value="10" />
+        </label>
+        <label>
+          Alignment
+          <input id="align" type="range" min="0" max="3" value="1.2" step="0.1" />
+        </label>
+        <label>
+          Cohesion
+          <input id="cohesion" type="range" min="0" max="3" value="0.8" step="0.1" />
+        </label>
+        <label>
+          Separation
+          <input id="separate" type="range" min="0" max="4" value="1.8" step="0.1" />
+        </label>
+        <label>
+          Speed
+          <input id="speed" type="range" min="1" max="6" value="3.2" step="0.1" />
+        </label>
+
+                <div class="legend">
+          <div><span class="dot blue"></span>Small: blue-green</div>
+          <div><span class="dot yellow"></span>Middle: yellow</div>
+          <div><span class="dot orange"></span>Boss: orange</div>
+          <div><span class="dot pink"></span>Octopus: pink</div>
+        </div>
+      </aside>
+    </main>
+
+    <script src="main.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("service-worker.js");
+        });
+      }
+    </script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
