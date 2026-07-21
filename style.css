@@ -82,7 +82,7 @@ h1 {
   left: 28px;
   bottom: 24px;
   color: #d7efeb;
-  font-size: 13px;
+  font-size: clamp(18px, 3vw, 30px);
 }
 .startOverlay,
 .resultOverlay {
@@ -120,6 +120,57 @@ h1 {
   text-shadow: 0 4px 0 rgba(5, 38, 42, 0.9), 0 0 28px rgba(255, 243, 109, 0.55);
 }
 
+.resultScore {
+  display: grid;
+  min-width: min(840px, 94vw);
+  gap: 16px;
+  padding: clamp(28px, 5vw, 58px) clamp(28px, 6vw, 72px);
+  border: 3px solid rgba(190, 239, 231, 0.58);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(0, 238, 255, 0.2), transparent 32%),
+    radial-gradient(circle at 86% 24%, rgba(255, 82, 184, 0.18), transparent 30%),
+    rgba(3, 18, 22, 0.72);
+  color: #f8fffb;
+  font-size: clamp(24px, 5vw, 44px);
+  font-weight: 850;
+  line-height: 1.2;
+  text-shadow: 0 4px 0 rgba(5, 38, 42, 0.88), 0 0 34px rgba(0, 238, 255, 0.38), 0 0 52px rgba(255, 82, 184, 0.22);
+  box-shadow: 0 0 38px rgba(0, 238, 255, 0.24), 0 0 64px rgba(255, 82, 184, 0.16), inset 0 0 28px rgba(190, 239, 231, 0.12);
+}
+
+.resultScore strong {
+  display: block;
+  color: #eaffff;
+  font-size: clamp(116px, 24vw, 280px);
+  font-weight: 950;
+  line-height: 0.8;
+  text-shadow: 0 7px 0 rgba(0, 116, 132, 0.88), 0 0 48px rgba(0, 238, 255, 0.72), 0 0 84px rgba(255, 82, 184, 0.36);
+}
+
+.resultScore .scoreLabel {
+  color: #9ee7dc;
+  font-size: clamp(18px, 3vw, 30px);
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.resultScore.record {
+  border-color: rgba(255, 246, 110, 0.98);
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 246, 110, 0.32), transparent 28%),
+    radial-gradient(circle at 88% 28%, rgba(255, 82, 184, 0.34), transparent 30%),
+    rgba(5, 28, 32, 0.74);
+  box-shadow: 0 0 52px rgba(255, 246, 110, 0.52), 0 0 88px rgba(255, 82, 184, 0.28), inset 0 0 34px rgba(0, 238, 255, 0.18);
+}
+
+.resultScore.record strong {
+  color: #fff66f;
+  font-size: clamp(132px, 27vw, 320px);
+  text-shadow: 0 6px 0 #ff52b8, 0 12px 0 rgba(0, 214, 255, 0.78), 0 0 46px rgba(255, 246, 110, 0.9), 0 0 80px rgba(255, 82, 184, 0.55);
+}
+
 .choiceGrid {
   display: grid;
   width: 100%;
@@ -133,7 +184,7 @@ h1 {
 
 .choiceLabel {
   color: #9ee7dc;
-  font-size: 13px;
+  font-size: clamp(18px, 3vw, 30px);
   font-weight: 900;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -303,6 +354,19 @@ h1 {
   text-shadow: 0 4px 0 rgba(20, 34, 40, 0.95), 0 0 24px rgba(123, 160, 166, 0.55);
 }
 
+.resultOverlay.record {
+  background:
+    radial-gradient(circle at 20% 25%, rgba(255, 246, 110, 0.36), transparent 22%),
+    radial-gradient(circle at 82% 36%, rgba(255, 82, 184, 0.38), transparent 26%),
+    radial-gradient(circle at 50% 82%, rgba(0, 238, 255, 0.26), transparent 30%),
+    rgba(5, 20, 24, 0.68);
+}
+
+.resultOverlay.record .resultTitle {
+  color: #fff66f;
+  text-shadow: 0 5px 0 #ff52b8, 0 10px 0 rgba(0, 214, 255, 0.78), 0 0 36px rgba(255, 246, 110, 0.86);
+}
+
 
 .panel {
   display: flex;
@@ -392,7 +456,7 @@ input[type="range"] {
   display: grid;
   gap: 12px;
   color: #bfdad6;
-  font-size: 13px;
+  font-size: clamp(18px, 3vw, 30px);
 }
 
 .dot {
@@ -572,4 +636,8 @@ input[type="range"] {
     top: max(12px, env(safe-area-inset-top));
   }
 }
+
+
+
+
 

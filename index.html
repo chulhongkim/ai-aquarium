@@ -8,9 +8,9 @@
     <meta name="apple-mobile-web-app-title" content="AI Aquarium" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>AI Aquarium</title>
-    <link rel="manifest" href="manifest.webmanifest?v=5" />
+    <link rel="manifest" href="manifest.webmanifest?v=6" />
     <link rel="apple-touch-icon" href="icon-180.png" />
-    <link rel="stylesheet" href="style.css?v=5" />
+    <link rel="stylesheet" href="style.css?v=6" />
   </head>
   <body>
     <main class="app">
@@ -64,7 +64,8 @@
           </div>
         </div>
         <div id="resultOverlay" class="resultOverlay" hidden>
-          <div class="resultTitle">YOU WIN!</div>
+          <div class="resultTitle">GAME OVER</div>
+          <div class="resultScore" aria-live="polite"></div>
           <button id="playAgainBtn" type="button">Play Again</button>
         </div>
       </section>
@@ -137,14 +138,18 @@
       </aside>
     </main>
 
-    <script src="main.js?v=5"></script>
+    <script src="main.js?v=6"></script>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("service-worker.js?v=5");
+          navigator.serviceWorker.register("service-worker.js?v=6");
         });
       }
     </script>
   </body>
 </html>
+
+
+
+
 

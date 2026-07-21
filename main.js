@@ -42,6 +42,7 @@ const ui = {
   joystickKnob: document.querySelector("#joystickKnob"),
   resultOverlay: document.querySelector("#resultOverlay"),
   resultTitle: document.querySelector(".resultTitle"),
+  resultScore: document.querySelector(".resultScore"),
   playAgain: document.querySelector("#playAgainBtn"),
 };
 
@@ -54,16 +55,17 @@ const plantFood = [];
 const eggs = [];
 const waste = [];
 const redClouds = [];
-const diver = { active: false, x: 0, y: 0, vx: 1.1, vy: 0, timer: 0, spawnAt: 300, survivalTimer: 0, entered: false, stamina: 1, fleeing: false };
+const diver = { active: false, x: 0, y: 0, vx: 1.1, vy: 0, timer: 0, spawnAt: 300, survivalTimer: 0, entered: false, stamina: 1, fleeing: false, hiddenInSchool: false, schoolCover: 0 };
 const difficultyLevels = {
-  beginner: { label: "Beginner", chaseBoost: 0.44, sharkMax: 9.2, diverBite: 1.05, fishBite: 0.9 },
-  middle: { label: "Normal", chaseBoost: 0.58, sharkMax: 11.8, diverBite: 1.3, fishBite: 1 },
-  advanced: { label: "Advanced", chaseBoost: 0.74, sharkMax: 14.2, diverBite: 1.55, fishBite: 1.14 },
+  beginner: { label: "Beginner", chaseBoost: 0.44, sharkMax: 9.2, diverBite: 1.05, fishBite: 0.9, fishMultiplier: 1.3 },
+  middle: { label: "Normal", chaseBoost: 0.58, sharkMax: 11.8, diverBite: 1.3, fishBite: 1, fishMultiplier: 1 },
+  advanced: { label: "Advanced", chaseBoost: 0.74, sharkMax: 14.2, diverBite: 1.55, fishBite: 1.14, fishMultiplier: 0.68 },
 };
 const gameState = { started: false, over: false, result: null, level: "middle", device: "pc", mode: "game" };
 const winMessage = { active: false, timer: 0 };
-const shark = { x: 0, y: 0, vx: 2.4, vy: 0.2, size: 34, wiggle: 0, hunger: 0, fullness: 0, speedMood: 1, chasePower: 0.11 };
+const shark = { x: 0, y: 0, vx: 2.4, vy: 0.2, size: 34, wiggle: 0, hunger: 0, fullness: 0, speedMood: 1, chasePower: 0.11, nextSpeedChangeAt: 0 };
 const SETTINGS_KEY = "ai-aquarium-slider-settings";
+const BEST_SCORE_KEY = "ai-aquarium-best-survival-score";
 const sliderKeys = [
   "smallCount",
   "middleCount",
@@ -289,6 +291,28 @@ function connectSettingPersistence() {
   }
 }
 
+function keepInsideTank(entity, radius, bounce = 0.55) {
+  const left = radius;
+  const right = Math.max(left, width - radius);
+  const top = radius;
+  const bottom = Math.max(top, height - radius);
+
+  if (entity.x < left) {
+    entity.x = left;
+    entity.vx = Math.abs(entity.vx) * bounce;
+  } else if (entity.x > right) {
+    entity.x = right;
+    entity.vx = -Math.abs(entity.vx) * bounce;
+  }
+
+  if (entity.y < top) {
+    entity.y = top;
+    entity.vy = Math.abs(entity.vy) * bounce;
+  } else if (entity.y > bottom) {
+    entity.y = bottom;
+    entity.vy = -Math.abs(entity.vy) * bounce;
+  }
+}
 function rand(min, max) {
   return min + Math.random() * (max - min);
 }
@@ -345,6 +369,8 @@ function makeFish(x = rand(0, width), y = rand(0, height), kind = "normal", spec
     size: (isBoss ? rand(11, 15) : isMiddle ? rand(8, 10.5) : rand(3.5, 7.5)) * scale,
     hue,
     wiggle: rand(0, Math.PI * 2),
+    wanderPhase: rand(0, Math.PI * 2),
+    schoolBias: rand(0.82, 1.18),
     age: rand(900, 1800),
     meals: 3,
   };
@@ -359,22 +385,33 @@ function removeBy(field, value) {
   if (index !== -1) fish.splice(index, 1);
 }
 
+function levelFishMultiplier() {
+  return difficultyLevels[gameState.level]?.fishMultiplier || 1;
+}
+
+function scaleFishTargets(targets) {
+  const multiplier = levelFishMultiplier();
+  const scaled = {};
+  for (const [key, value] of Object.entries(targets)) scaled[key] = Math.max(0, Math.round(value * multiplier));
+  return scaled;
+}
+
 function targetSpeciesCounts() {
-  return {
+  return scaleFishTargets({
     fish: Number(ui.fishShapeCount.value),
     ray: Number(ui.rayCount.value),
     octopus: Number(ui.octopusCount.value),
     squid: Number(ui.squidCount.value),
     mola: Number(ui.molaCount.value),
-  };
+  });
 }
 
 function targetKindCounts() {
-  return {
+  return scaleFishTargets({
     normal: Number(ui.smallCount.value),
     middle: Number(ui.middleCount.value),
     boss: Number(ui.bossCount.value),
-  };
+  });
 }
 
 function pickKind(kindTargets) {
@@ -424,10 +461,25 @@ function syncFishCount() {
 
 function randomizeSharkSpeed() {
   const speedScale = sharkMovementScale();
-  shark.speedMood = rand(0.72, 1.48);
+  const roll = Math.random();
+  if (roll < 0.34) shark.speedMood = rand(0.58, 0.82);
+  else if (roll < 0.67) shark.speedMood = rand(0.9, 1.12);
+  else shark.speedMood = rand(1.28, 1.72);
   shark.chasePower = (0.075 + shark.speedMood * 0.045) * speedScale;
   shark.vx = rand(2.4, 3.7) * shark.speedMood * speedScale;
   shark.vy = rand(-0.4, 0.4) * shark.speedMood * speedScale;
+  shark.nextSpeedChangeAt = performance.now() + rand(2200, 5200);
+}
+
+function maybeRandomizeSharkSpeed() {
+  if (performance.now() < shark.nextSpeedChangeAt) return;
+  const oldSpeed = Math.hypot(shark.vx, shark.vy) || 1;
+  const oldMood = shark.speedMood || 1;
+  randomizeSharkSpeed();
+  const direction = Math.atan2(shark.vy, shark.vx);
+  const newSpeed = Math.max(1.2, oldSpeed * (shark.speedMood / oldMood));
+  shark.vx = Math.cos(direction) * newSpeed;
+  shark.vy = Math.sin(direction) * newSpeed;
 }
 
 function reset(showStart = true) {
@@ -436,8 +488,8 @@ function reset(showStart = true) {
   food.length = 0;
   plantFood.length = 0;
   shark.size = 34 * entityScale();
-  shark.x = -120;
-  shark.y = rand(Math.max(80, height * 0.16), Math.max(120, height * 0.72));
+  shark.x = Math.min(width - shark.size * 2.8, shark.size * 2.8);
+  shark.y = rand(shark.size * 1.5, Math.max(shark.size * 1.5, height - shark.size * 1.5));
   randomizeSharkSpeed();
   shark.hunger = 0;
   shark.fullness = 0;
@@ -456,9 +508,13 @@ function reset(showStart = true) {
   stopAquariumBgm();
   winMessage.active = false;
   winMessage.timer = 0;
-  if (ui.resultTitle) ui.resultTitle.textContent = "YOU WIN!";
+  if (ui.resultTitle) ui.resultTitle.textContent = "GAME OVER";
+  if (ui.resultScore) {
+    ui.resultScore.textContent = "";
+    ui.resultScore.classList.remove("record", "standard");
+  }
   if (ui.resultOverlay) {
-    ui.resultOverlay.classList.remove("win", "gameover");
+    ui.resultOverlay.classList.remove("win", "gameover", "record");
     ui.resultOverlay.hidden = true;
   }
   resetJoystick();
@@ -665,8 +721,8 @@ function makeWaste(x, y) {
 
 function updateFish(f, index) {
   // Gather nearby neighbors for the three flocking rules.
-  const perception = 74;
-  const avoidRadius = 24;
+  const perception = 92;
+  const avoidRadius = 26;
   let alignX = 0;
   let alignY = 0;
   let centerX = 0;
@@ -683,8 +739,9 @@ function updateFish(f, index) {
     const distance = Math.hypot(dx, dy);
     if (distance > 0 && distance < perception) {
       // Alignment: add nearby fish velocity, then average it into a direction.
-      alignX += other.vx;
-      alignY += other.vy;
+      const kinship = other.kind === f.kind ? 1.08 : other.species === f.species ? 1.03 : 0.96;
+      alignX += other.vx * kinship;
+      alignY += other.vy * kinship;
       // Cohesion: add nearby fish positions, then steer toward the group center.
       centerX += other.x;
       centerY += other.y;
@@ -708,8 +765,12 @@ function updateFish(f, index) {
     alignY /= seen;
     centerX = centerX / seen - f.x;
     centerY = centerY / seen - f.y;
-    f.vx += alignX * 0.012 * alignWeight + centerX * 0.0022 * cohesionWeight + awayX * 0.09 * separateWeight;
-    f.vy += alignY * 0.012 * alignWeight + centerY * 0.0022 * cohesionWeight + awayY * 0.09 * separateWeight;
+    const schoolBias = f.schoolBias || 1;
+    const formationCalm = Math.min(1, seen / 8);
+    f.vx += alignX * 0.0145 * alignWeight * schoolBias + centerX * 0.0028 * cohesionWeight * schoolBias + awayX * 0.082 * separateWeight;
+    f.vy += alignY * 0.0145 * alignWeight * schoolBias + centerY * 0.0028 * cohesionWeight * schoolBias + awayY * 0.082 * separateWeight;
+    f.vx += Math.cos(f.wanderPhase + f.age * 0.014) * 0.012 * (1 - formationCalm);
+    f.vy += Math.sin(f.wanderPhase + f.age * 0.011) * 0.012 * (1 - formationCalm);
   }
 
   f.age += 1;
@@ -784,11 +845,7 @@ function updateFish(f, index) {
   f.y += f.vy;
   f.wiggle += 0.18;
 
-  // Wrap any fish that slips offscreen back from the opposite side.
-  if (f.x < -20) f.x = width + 20;
-  if (f.x > width + 20) f.x = -20;
-  if (f.y < -20) f.y = height + 20;
-  if (f.y > height + 20) f.y = -20;
+  keepInsideTank(f, Math.max(8, f.size * 1.8));
 }
 
 function drawBackground(time) {
@@ -897,9 +954,9 @@ function baseStyle(f) {
   const isBoss = f.kind === "boss";
   const isMiddle = f.kind === "middle";
   return {
-    body: `hsl(${f.hue} ${isBoss ? 92 : isMiddle ? 94 : 86}% ${isBoss ? 58 : isMiddle ? 62 : 66}%)`,
-    accent: `hsl(${f.hue + (isBoss ? 12 : isMiddle ? 8 : 38)} 88% ${isBoss ? 48 : isMiddle ? 52 : 58}%)`,
-    stroke: isBoss ? "rgba(255, 240, 180, 0.9)" : isMiddle ? "rgba(255, 247, 150, 0.62)" : "rgba(2, 22, 24, 0.35)",
+    body: `hsl(${f.hue} ${isBoss ? 56 : isMiddle ? 50 : 42}% ${isBoss ? 48 : isMiddle ? 52 : 54}%)`,
+    accent: `hsl(${f.hue + (isBoss ? 12 : isMiddle ? 8 : 28)} ${isBoss ? 58 : isMiddle ? 52 : 46}% ${isBoss ? 40 : isMiddle ? 44 : 48}%)`,
+    stroke: isBoss ? "rgba(245, 230, 185, 0.58)" : isMiddle ? "rgba(222, 234, 194, 0.42)" : "rgba(3, 24, 26, 0.28)",
     line: isBoss ? 2.5 : isMiddle ? 1.6 : 1,
   };
 }
@@ -1085,10 +1142,30 @@ function hatchManyEggs(limit = 90) {
   }
 }
 
+function diverBoundsRadius() {
+  return 78 * entityScale();
+}
+function isSharkWaitingForDiver() {
+  return gameState.started && !diver.active && diver.timer >= Math.max(0, diver.spawnAt - 300);
+}
+
+function holdSharkForDiverStandby(targetY = height * 0.5) {
+  const margin = shark.size * 3.2;
+  shark.x = Math.max(margin, width - margin);
+  shark.y += (targetY - shark.y) * 0.045;
+  shark.y = Math.max(shark.size * 1.8, Math.min(height - shark.size * 1.8, shark.y));
+  shark.vx *= 0.68;
+  shark.vy *= 0.68;
+}
+
 function spawnDiver() {
   diver.active = true;
-  diver.x = -95;
-  diver.y = rand(height * 0.22, height * 0.58);
+  diver.x = diverBoundsRadius();
+  diver.y = rand(diverBoundsRadius(), Math.max(diverBoundsRadius(), height - diverBoundsRadius()));
+  holdSharkForDiverStandby(diver.y);
+  shark.vx = -Math.abs(rand(1.2, 2.4) * shark.speedMood * sharkMovementScale());
+  shark.vy = rand(-0.18, 0.18);
+  shark.nextSpeedChangeAt = performance.now() + rand(1800, 3600);
   diver.vx = rand(0.9, 1.25);
   diver.vy = rand(-0.12, 0.12);
   diver.timer = 0;
@@ -1096,6 +1173,8 @@ function spawnDiver() {
   diver.entered = false;
   diver.stamina = 1;
   diver.fleeing = false;
+  diver.hiddenInSchool = false;
+  diver.schoolCover = 0;
 }
 
 function updateDiver() {
@@ -1110,7 +1189,10 @@ function updateDiver() {
   const sharkDx = diver.x - shark.x;
   const sharkDy = diver.y - shark.y;
   const sharkDistance = Math.hypot(sharkDx, sharkDy);
-  diver.fleeing = sharkDistance < 310;
+  const nearbyFish = fish.reduce((count, f) => count + (Math.hypot(f.x - diver.x, f.y - diver.y) < 135 ? 1 : 0), 0);
+  diver.schoolCover = Math.min(1, nearbyFish / 8);
+  diver.hiddenInSchool = nearbyFish >= 5;
+  diver.fleeing = sharkDistance < 310 && !diver.hiddenInSchool;
 
   const keyboardX = (keys.ArrowRight ? 1 : 0) - (keys.ArrowLeft ? 1 : 0);
   const keyboardY = (keys.ArrowDown ? 1 : 0) - (keys.ArrowUp ? 1 : 0);
@@ -1137,21 +1219,14 @@ function updateDiver() {
   limitSpeed(diver, maxDiverSpeed);
   diver.x += diver.vx;
   diver.y += diver.vy + Math.sin(diver.timer * 0.035) * 0.18;
-  if (diver.y < 70) diver.vy += 0.06;
-  if (diver.y > height - 120) diver.vy -= 0.06;
+  if (diver.y < diverBoundsRadius()) diver.vy += 0.08;
+  if (diver.y > height - diverBoundsRadius()) diver.vy -= 0.08;
   if (!diver.entered && diver.x >= 0) {
     diver.entered = true;
     diver.survivalTimer = 0;
   }
   if (diver.entered) diver.survivalTimer += 1;
-  if (diver.survivalTimer >= 1200) {
-    showResult("win");
-    return;
-  }
-  if (diver.x > width + 120) {
-    diver.x = width + 120;
-    diver.vx = Math.min(diver.vx, 0);
-  }
+  keepInsideTank(diver, diverBoundsRadius(), 0.2);
 }
 
 function triggerDiverEvent() {
@@ -1200,21 +1275,21 @@ function drawDiver() {
   ctx.rotate(Math.sin(diver.timer * 0.03) * 0.08);
   ctx.lineCap = "round";
 
-  ctx.fillStyle = "rgba(255, 112, 48, 0.98)";
-  ctx.strokeStyle = "rgba(255, 245, 180, 0.95)";
+  ctx.fillStyle = "rgba(255, 42, 80, 0.99)";
+  ctx.strokeStyle = "rgba(255, 255, 235, 0.98)";
   ctx.lineWidth = 4;
   ctx.beginPath();
   ctx.arc(0, -18, 13, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
 
-  ctx.fillStyle = "rgba(255, 139, 45, 0.98)";
-  ctx.strokeStyle = "rgba(13, 36, 48, 0.96)";
+  ctx.fillStyle = "rgba(255, 208, 35, 0.99)";
+  ctx.strokeStyle = "rgba(6, 28, 38, 0.98)";
   ctx.lineWidth = 3;
   ctx.fillRect(-13, -5, 26, 34);
   ctx.strokeRect(-13, -5, 26, 34);
 
-  ctx.strokeStyle = diver.fleeing ? "rgba(79, 245, 255, 0.96)" : "rgba(221, 246, 250, 0.95)";
+  ctx.strokeStyle = diver.hiddenInSchool ? "rgba(128, 255, 154, 0.98)" : diver.fleeing ? "rgba(0, 238, 255, 0.98)" : "rgba(248, 255, 255, 0.98)";
   ctx.lineWidth = 5;
   ctx.beginPath();
   ctx.moveTo(-10, 2);
@@ -1227,10 +1302,10 @@ function drawDiver() {
   ctx.lineTo(24, 52 - kick);
   ctx.stroke();
 
-  ctx.fillStyle = "rgba(69, 231, 255, 0.95)";
+  ctx.fillStyle = "rgba(0, 242, 255, 0.98)";
   ctx.fillRect(-28, 51 + kick, 20, 6);
   ctx.fillRect(13, 51 - kick, 20, 6);
-  ctx.fillStyle = "rgba(245, 255, 120, 0.96)";
+  ctx.fillStyle = "rgba(255, 64, 112, 0.98)";
   ctx.fillRect(-16, -24, 32, 6);
 
   ctx.fillStyle = "rgba(5, 18, 22, 0.7)";
@@ -1243,12 +1318,24 @@ function drawDiver() {
 function updateShark() {
   shark.hunger += 0.004;
   shark.wiggle += 0.12;
+  if (isSharkWaitingForDiver()) {
+    holdSharkForDiverStandby(height * 0.5 + Math.sin(diver.timer * 0.025) * height * 0.18);
+    return;
+  }
+  maybeRandomizeSharkSpeed();
   let target = null;
   let nearest = Infinity;
 
   if (diver.active) {
     target = diver;
     nearest = Math.hypot(diver.x - shark.x, diver.y - shark.y);
+    if (diver.hiddenInSchool && Math.random() < 0.72) {
+      const decoys = fish.filter((f) => Math.hypot(f.x - diver.x, f.y - diver.y) < 155);
+      if (decoys.length) {
+        target = decoys[Math.floor(Math.random() * decoys.length)];
+        nearest = Math.hypot(target.x - shark.x, target.y - shark.y);
+      }
+    }
   } else {
     for (const candidate of fish) {
       const distance = Math.hypot(candidate.x - shark.x, candidate.y - shark.y);
@@ -1264,7 +1351,8 @@ function updateShark() {
     const dy = target.y - shark.y;
     const distance = Math.hypot(dx, dy) || 1;
     const level = difficultyLevels[gameState.level];
-    const chaseBoost = diver.active ? level.chaseBoost * sharkMovementScale() : shark.chasePower;
+    const confusion = diver.active && diver.hiddenInSchool ? 1 - diver.schoolCover * 0.62 : 1;
+    const chaseBoost = diver.active ? level.chaseBoost * sharkMovementScale() * shark.speedMood * confusion : shark.chasePower;
     shark.vx += (dx / distance) * chaseBoost;
     shark.vy += (dy / distance) * chaseBoost;
   } else {
@@ -1273,19 +1361,15 @@ function updateShark() {
   }
 
   const level = difficultyLevels[gameState.level];
-  const maxSpeed = (diver.active ? level.sharkMax : 3.2 + shark.speedMood * 2.4 + Math.min(shark.hunger, 1.6)) * sharkMovementScale();
+  const confusionSpeed = diver.active && diver.hiddenInSchool ? 1 - diver.schoolCover * 0.34 : 1;
+  const maxSpeed = (diver.active ? level.sharkMax * shark.speedMood * confusionSpeed : 3.2 + shark.speedMood * 2.4 + Math.min(shark.hunger, 1.6)) * sharkMovementScale();
   limitSpeed(shark, maxSpeed);
   shark.x += shark.vx;
   shark.y += shark.vy;
 
-  if (shark.y < 80) shark.vy += 0.18;
-  if (shark.y > height - 130) shark.vy -= 0.18;
-  if (shark.x > width + 180) {
-    shark.x = -180;
-    shark.y = rand(height * 0.16, height * 0.72);
-    randomizeSharkSpeed();
-  }
-  if (shark.x < -220) shark.vx += 0.2;
+  if (shark.y < shark.size * 1.8) shark.vy += 0.18;
+  if (shark.y > height - shark.size * 1.8) shark.vy -= 0.18;
+  keepInsideTank(shark, shark.size * 2.8, 0.35);
 
   if (diver.active && Math.hypot(diver.x - shark.x, diver.y - shark.y) < shark.size * difficultyLevels[gameState.level].diverBite) {
     triggerDiverEvent();
@@ -1317,8 +1401,12 @@ function drawShark() {
   ctx.save();
   ctx.translate(shark.x, shark.y);
   ctx.rotate(angle);
-  ctx.fillStyle = "rgba(126, 151, 160, 0.96)";
-  ctx.strokeStyle = "rgba(225, 240, 238, 0.34)";
+  const sharkBody = ctx.createLinearGradient(-shark.size * 1.8, -shark.size, shark.size * 2.8, shark.size);
+  sharkBody.addColorStop(0, "rgba(160, 96, 255, 0.98)");
+  sharkBody.addColorStop(0.48, "rgba(255, 82, 184, 0.98)");
+  sharkBody.addColorStop(1, "rgba(255, 174, 214, 0.98)");
+  ctx.fillStyle = sharkBody;
+  ctx.strokeStyle = "rgba(255, 244, 252, 0.58)";
   ctx.lineWidth = 2.5;
   ctx.beginPath();
   ctx.moveTo(shark.size * 2.7, 0);
@@ -1328,7 +1416,7 @@ function drawShark() {
   ctx.fill();
   ctx.stroke();
 
-  ctx.fillStyle = "rgba(92, 113, 124, 0.96)";
+  ctx.fillStyle = "rgba(126, 83, 255, 0.98)";
   ctx.beginPath();
   ctx.moveTo(-shark.size * 1.35, 0);
   ctx.lineTo(-shark.size * 2.5, -shark.size * 0.95 + tail);
@@ -1336,7 +1424,7 @@ function drawShark() {
   ctx.closePath();
   ctx.fill();
 
-  ctx.fillStyle = "rgba(143, 163, 172, 0.96)";
+  ctx.fillStyle = "rgba(0, 214, 255, 0.96)";
   ctx.beginPath();
   ctx.moveTo(shark.size * 0.1, -shark.size * 0.78);
   ctx.lineTo(shark.size * 0.75, -shark.size * 1.65);
@@ -1348,7 +1436,7 @@ function drawShark() {
   ctx.arc(shark.size * 1.62, -shark.size * 0.2, shark.size * 0.08, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = "rgba(34, 8, 10, 0.9)";
+  ctx.strokeStyle = "rgba(82, 0, 38, 0.92)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(shark.size * 1.8, shark.size * 0.22);
@@ -1389,6 +1477,41 @@ function drawWaste() {
 }
 
 
+function survivalSeconds() {
+  return Math.max(0, diver.survivalTimer / 60);
+}
+
+function formatSeconds(seconds) {
+  return `${seconds.toFixed(1)}s`;
+}
+
+function readBestScore() {
+  try {
+    return Number(localStorage.getItem(BEST_SCORE_KEY) || 0) || 0;
+  } catch (error) {
+    return 0;
+  }
+}
+
+function writeBestScore(score) {
+  try {
+    localStorage.setItem(BEST_SCORE_KEY, String(score));
+  } catch (error) {
+    // Keep the score in-memory only when localStorage is unavailable.
+  }
+}
+
+function buildResultScore(result) {
+  const score = survivalSeconds();
+  const previousBest = readBestScore();
+  const isRecord = score > previousBest;
+  if (isRecord) writeBestScore(score);
+  const best = Math.max(score, previousBest);
+  const title = result === "gameover" && isRecord ? "NEW RECORD!" : result === "gameover" ? "GAME OVER" : "SURVIVED!";
+  const detail = isRecord ? `Previous ${formatSeconds(previousBest)}` : `Best ${formatSeconds(best)}`;
+  return { title, score, isRecord, html: `<span class="scoreLabel">Score</span><strong>${formatSeconds(score)}</strong><span>${detail}</span>` };
+}
+
 function showResult(result) {
   resetJoystick();
   if (ui.startOverlay) ui.startOverlay.hidden = true;
@@ -1397,10 +1520,17 @@ function showResult(result) {
   gameState.result = result;
   winMessage.active = true;
   winMessage.timer = Infinity;
-  if (ui.resultTitle) ui.resultTitle.textContent = result === "win" ? "YOU WIN!" : "GAME OVER";
+  const scoreResult = buildResultScore(result);
+  if (ui.resultTitle) ui.resultTitle.textContent = scoreResult.title;
+  if (ui.resultScore) {
+    ui.resultScore.innerHTML = scoreResult.html;
+    ui.resultScore.classList.toggle("record", scoreResult.isRecord);
+    ui.resultScore.classList.toggle("standard", !scoreResult.isRecord);
+  }
   if (ui.resultOverlay) {
-    ui.resultOverlay.classList.toggle("win", result === "win");
-    ui.resultOverlay.classList.toggle("gameover", result === "gameover");
+    ui.resultOverlay.classList.toggle("win", false);
+    ui.resultOverlay.classList.toggle("record", scoreResult.isRecord);
+    ui.resultOverlay.classList.toggle("gameover", result === "gameover" && !scoreResult.isRecord);
     ui.resultOverlay.hidden = false;
   }
   playResultMusic(result);
@@ -1418,13 +1548,12 @@ function updateWinMessage() {
 
 function drawGameTimer() {
   if (gameState.mode === "view") return;
-  const totalFrames = 1200;
   let label = gameState.started ? "DIVER IN 5" : "SELECT LEVEL";
   let seconds = null;
 
   if (diver.active && diver.entered) {
-    seconds = Math.max(0, Math.ceil((totalFrames - diver.survivalTimer) / 60));
-    label = `${seconds}`;
+    seconds = survivalSeconds();
+    label = formatSeconds(seconds);
   } else if (diver.active) {
     label = "ENTER THE WATER";
   } else if (!gameState.started) {
@@ -1432,10 +1561,8 @@ function drawGameTimer() {
   } else if (!gameState.over) {
     seconds = Math.max(0, Math.ceil((diver.spawnAt - diver.timer) / 60));
     label = `DIVER IN ${seconds}`;
-  } else if (gameState.result === "win") {
-    label = "0";
   } else if (gameState.result === "gameover") {
-    label = "GAME OVER";
+    label = formatSeconds(survivalSeconds());
   }
 
   ctx.save();
@@ -1445,16 +1572,16 @@ function drawGameTimer() {
   ctx.strokeStyle = "rgba(190, 239, 231, 0.26)";
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.roundRect(width / 2 - 96, 22, 192, 54, 8);
+  ctx.roundRect(width / 2 - 110, 22, 220, 54, 8);
   ctx.fill();
   ctx.stroke();
   ctx.fillStyle = "rgba(190, 239, 231, 0.88)";
   ctx.font = "800 11px Segoe UI, sans-serif";
-  const timerTitle = gameState.started ? `TIME LEFT / ${difficultyLevels[gameState.level].label}` : "SELECT LEVEL";
+  const timerTitle = gameState.started ? `SURVIVAL / ${difficultyLevels[gameState.level].label}` : "SELECT LEVEL";
   ctx.fillText(timerTitle, width / 2, 36);
-  ctx.fillStyle = seconds !== null && seconds <= 5 ? "#ffcf6b" : "#f8fffb";
-  ctx.font = label.length > 3 ? "900 18px Segoe UI, sans-serif" : "900 28px Segoe UI, sans-serif";
-  ctx.fillText(label, width / 2, 60);
+  ctx.fillStyle = "#f8fffb";
+  ctx.font = label.length > 8 ? "900 18px Segoe UI, sans-serif" : "900 28px Segoe UI, sans-serif";
+  ctx.fillText(label, width / 2, 59);
   ctx.restore();
 }
 function drawWinMessage() {
@@ -1468,7 +1595,7 @@ function drawWinMessage() {
   ctx.font = `900 ${Math.min(92, Math.max(44, width * 0.09))}px Segoe UI, sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  const message = gameState.result === "gameover" ? "GAME OVER" : "YOU WIN!";
+  const message = gameState.result === "gameover" ? "GAME OVER" : "SURVIVED!";
   ctx.strokeText(message, width / 2, height * 0.42);
   ctx.fillText(message, width / 2, height * 0.42);
   ctx.restore();
@@ -1676,4 +1803,20 @@ connectSettingPersistence();
 resize();
 reset();
 requestAnimationFrame(loop);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

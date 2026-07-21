@@ -1,10 +1,10 @@
-﻿const CACHE_NAME = "ai-aquarium-v5";
+﻿const CACHE_NAME = "ai-aquarium-v6";
 const ASSETS = [
   "./",
   "./index.html",
-  "./style.css?v=5",
-  "./main.js?v=5",
-  "./manifest.webmanifest?v=5",
+  "./style.css?v=6",
+  "./main.js?v=6",
+  "./manifest.webmanifest?v=6",
   "./icon.svg",
   "./icon-180.png",
   "./icon-512.png",
@@ -28,4 +28,5 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
 });
+
 
