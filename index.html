@@ -57,6 +57,7 @@
           <button id="viewStartBtn" type="button">Start Game</button>
           <button id="setupBtn" type="button">Setup</button>
         </div>
+        <button id="panelToggleBtn" class="panelToggleBtn" type="button" aria-controls="controlPanel" aria-expanded="false">Control</button>
         <div id="touchControls" class="touchControls" hidden aria-label="diver joystick">
           <div id="joystickBase" class="joystickBase" role="application" aria-label="Slide to move the diver">
             <div id="joystickKnob" class="joystickKnob"></div>
@@ -68,10 +69,13 @@
         </div>
       </section>
 
-      <aside class="panel" aria-label="simulation controls">
+      <aside id="controlPanel" class="panel" aria-label="simulation controls">
         <div class="panelHeader">
           <p class="eyebrow">CONTROL</p>
-          <button id="resetBtn" type="button">Reset</button>
+          <div class="panelActions">
+            <button id="panelCloseBtn" class="panelCloseBtn" type="button">Close</button>
+            <button id="resetBtn" type="button">Reset</button>
+          </div>
         </div>
 
                 <label>

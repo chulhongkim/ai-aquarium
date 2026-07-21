@@ -346,10 +346,20 @@ h1 {
   font-weight: 800;
 }
 
+
 .panelHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.panelActions {
+  display: flex;
+  gap: 8px;
+}
+
+.panelCloseBtn,
+.panelToggleBtn {
+  display: none;
 }
 
 button {
@@ -502,6 +512,64 @@ input[type="range"] {
   .joystickKnob {
     width: 46px;
     height: 46px;
+  }
+}
+@media (orientation: landscape) and (max-height: 560px) and (max-width: 980px) {
+  body {
+    overflow: hidden;
+  }
+
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .stage,
+  canvas {
+    height: 100vh;
+  }
+
+  .panelToggleBtn {
+    position: absolute;
+    right: max(12px, env(safe-area-inset-right));
+    top: max(12px, env(safe-area-inset-top));
+    z-index: 6;
+    display: block;
+    min-width: 92px;
+    height: 40px;
+    padding: 0 14px;
+    background: rgba(216, 251, 243, 0.9);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.26);
+  }
+
+  .panel {
+    position: fixed;
+    inset: 0 0 0 auto;
+    z-index: 8;
+    width: min(320px, 84vw);
+    height: 100vh;
+    min-height: 0;
+    overflow-y: auto;
+    padding: max(14px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) 16px;
+    border-top: 0;
+    border-left: 1px solid rgba(190, 239, 231, 0.22);
+    box-shadow: -18px 0 36px rgba(0, 0, 0, 0.34);
+    transform: translateX(105%);
+    transition: transform 180ms ease;
+  }
+
+  .panel.open {
+    transform: translateX(0);
+  }
+
+  .panelCloseBtn {
+    display: block;
+    background: rgba(216, 251, 243, 0.14);
+    color: #d8fbf3;
+  }
+
+  .viewActions {
+    right: max(112px, calc(env(safe-area-inset-right) + 112px));
+    top: max(12px, env(safe-area-inset-top));
   }
 }
 

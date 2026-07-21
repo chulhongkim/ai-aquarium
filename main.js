@@ -34,6 +34,9 @@ const ui = {
   viewActions: document.querySelector("#viewActions"),
   viewStart: document.querySelector("#viewStartBtn"),
   setup: document.querySelector("#setupBtn"),
+  panel: document.querySelector("#controlPanel"),
+  panelToggle: document.querySelector("#panelToggleBtn"),
+  panelClose: document.querySelector("#panelCloseBtn"),
   touchControls: document.querySelector("#touchControls"),
   joystickBase: document.querySelector("#joystickBase"),
   joystickKnob: document.querySelector("#joystickKnob"),
@@ -290,6 +293,17 @@ function rand(min, max) {
   return min + Math.random() * (max - min);
 }
 
+
+function usesOverlayPanel() {
+  return window.matchMedia("(orientation: landscape) and (max-height: 560px) and (max-width: 980px)").matches;
+}
+
+function setPanelOpen(open) {
+  if (!ui.panel) return;
+  const shouldOpen = open && usesOverlayPanel();
+  ui.panel.classList.toggle("open", shouldOpen);
+  if (ui.panelToggle) ui.panelToggle.setAttribute("aria-expanded", String(shouldOpen));
+}
 function resize() {
   const rect = canvas.getBoundingClientRect();
   const scale = Math.min(window.devicePixelRatio || 1, 2);
@@ -298,6 +312,7 @@ function resize() {
   canvas.width = Math.floor(width * scale);
   canvas.height = Math.floor(height * scale);
   ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  if (!usesOverlayPanel()) setPanelOpen(false);
 }
 
 function entityScale() {
@@ -1581,6 +1596,12 @@ if (ui.start) ui.start.addEventListener("click", startGame);
 if (ui.viewStart) ui.viewStart.addEventListener("click", startGame);
 if (ui.view) ui.view.addEventListener("click", startViewMode);
 if (ui.setup) ui.setup.addEventListener("click", () => reset(true));
+if (ui.panelToggle) {
+  ui.panelToggle.addEventListener("click", () => setPanelOpen(!ui.panel.classList.contains("open")));
+}
+if (ui.panelClose) {
+  ui.panelClose.addEventListener("click", () => setPanelOpen(false));
+}
 function updateJoystick(event) {
   if (!ui.joystickBase || !ui.joystickKnob) return;
   const rect = ui.joystickBase.getBoundingClientRect();
