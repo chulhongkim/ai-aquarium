@@ -2,7 +2,8 @@
   "name": "AI Aquarium",
   "short_name": "Aquarium",
   "description": "A touch-friendly aquarium survival game.",
-  "start_url": "./index.html",
+  "id": "/ai-aquarium/?v=4",
+  "start_url": "./index.html?v=4",
   "scope": "./",
   "display": "standalone",
   "background_color": "#071316",
@@ -22,4 +23,3 @@
     }
   ]
 }
-

@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = "ai-aquarium-v3";
+﻿const CACHE_NAME = "ai-aquarium-v4";
 const ASSETS = [
   "./",
   "./index.html",
