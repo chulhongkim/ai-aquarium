@@ -180,6 +180,37 @@ h1 {
   box-shadow: 0 0 18px rgba(255, 243, 109, 0.42);
 }
 
+
+.viewActions {
+  position: absolute;
+  right: 24px;
+  top: 24px;
+  z-index: 4;
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid rgba(190, 239, 231, 0.18);
+  border-radius: 8px;
+  background: rgba(3, 19, 22, 0.42);
+  backdrop-filter: blur(12px);
+}
+
+.viewActions[hidden] {
+  display: none;
+}
+
+#viewStartBtn,
+#setupBtn {
+  min-width: 104px;
+  height: 38px;
+  padding: 0 14px;
+  font-size: 14px;
+}
+
+#setupBtn {
+  background: rgba(216, 251, 243, 0.14);
+  color: #d8fbf3;
+}
 .touchControls {
   position: absolute;
   right: 24px;
@@ -406,7 +437,7 @@ input[type="range"] {
     bottom: 16px;
   }
 
-  .touchControls {
+.touchControls {
     right: 16px;
     bottom: 76px;
     width: 128px;
@@ -461,7 +492,7 @@ input[type="range"] {
     bottom: 12px;
   }
 
-  .touchControls {
+.touchControls {
     right: 16px;
     bottom: 16px;
     width: 116px;
@@ -473,5 +504,4 @@ input[type="range"] {
     height: 46px;
   }
 }
-
 

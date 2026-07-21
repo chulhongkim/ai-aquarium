@@ -31,6 +31,9 @@ const ui = {
   levelButtons: document.querySelectorAll(".levelBtn"),
   start: document.querySelector("#startBtn"),
   view: document.querySelector("#viewBtn"),
+  viewActions: document.querySelector("#viewActions"),
+  viewStart: document.querySelector("#viewStartBtn"),
+  setup: document.querySelector("#setupBtn"),
   touchControls: document.querySelector("#touchControls"),
   joystickBase: document.querySelector("#joystickBase"),
   joystickKnob: document.querySelector("#joystickKnob"),
@@ -82,6 +85,7 @@ let lastBiteSoundAt = 0;
 let lastGrazeSoundAt = 0;
 let bgmTimer = null;
 let bgmGain = null;
+let lastUpdateTime = performance.now();
 
 function audio() {
   audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
@@ -296,6 +300,17 @@ function resize() {
   ctx.setTransform(scale, 0, 0, scale, 0, 0);
 }
 
+function entityScale() {
+  if (width <= 0 || height <= 0) return 1;
+  if (width > 760 && height > 560) return 1;
+  return Math.max(0.64, Math.min(1, Math.min(width / 760, height / 620)));
+}
+
+function sharkMovementScale() {
+  if (width > 760 && height > 560) return 1;
+  return Math.max(0.62, Math.min(0.82, entityScale() + 0.08));
+}
+
 function makeFish(x = rand(0, width), y = rand(0, height), kind = "normal", species = null) {
   const angle = rand(0, Math.PI * 2);
   const isBoss = kind === "boss";
@@ -303,14 +318,16 @@ function makeFish(x = rand(0, width), y = rand(0, height), kind = "normal", spec
   const speciesPool = isBoss ? ["mola", "ray"] : isMiddle ? ["fish", "squid", "ray", "mola"] : ["fish", "squid", "octopus", "ray"];
   const chosenSpecies = species || speciesPool[Math.floor(rand(0, speciesPool.length))];
   const hue = isBoss ? rand(30, 48) : isMiddle ? rand(52, 62) : chosenSpecies === "octopus" ? rand(315, 340) : rand(165, 205);
+  const scale = entityScale();
+  const speedScale = sharkMovementScale();
   return {
     kind,
     species: chosenSpecies,
     x,
     y,
-    vx: Math.cos(angle) * rand(1, isBoss ? 3.4 : isMiddle ? 3.2 : 3),
-    vy: Math.sin(angle) * rand(1, isBoss ? 3.4 : isMiddle ? 3.2 : 3),
-    size: isBoss ? rand(11, 15) : isMiddle ? rand(8, 10.5) : rand(3.5, 7.5),
+    vx: Math.cos(angle) * rand(1, isBoss ? 3.4 : isMiddle ? 3.2 : 3) * speedScale,
+    vy: Math.sin(angle) * rand(1, isBoss ? 3.4 : isMiddle ? 3.2 : 3) * speedScale,
+    size: (isBoss ? rand(11, 15) : isMiddle ? rand(8, 10.5) : rand(3.5, 7.5)) * scale,
     hue,
     wiggle: rand(0, Math.PI * 2),
     age: rand(900, 1800),
@@ -391,10 +408,11 @@ function syncFishCount() {
 
 
 function randomizeSharkSpeed() {
+  const speedScale = sharkMovementScale();
   shark.speedMood = rand(0.72, 1.48);
-  shark.chasePower = 0.075 + shark.speedMood * 0.045;
-  shark.vx = rand(2.4, 3.7) * shark.speedMood;
-  shark.vy = rand(-0.4, 0.4) * shark.speedMood;
+  shark.chasePower = (0.075 + shark.speedMood * 0.045) * speedScale;
+  shark.vx = rand(2.4, 3.7) * shark.speedMood * speedScale;
+  shark.vy = rand(-0.4, 0.4) * shark.speedMood * speedScale;
 }
 
 function reset(showStart = true) {
@@ -402,6 +420,7 @@ function reset(showStart = true) {
   fish.length = 0;
   food.length = 0;
   plantFood.length = 0;
+  shark.size = 34 * entityScale();
   shark.x = -120;
   shark.y = rand(Math.max(80, height * 0.16), Math.max(120, height * 0.72));
   randomizeSharkSpeed();
@@ -438,6 +457,7 @@ function updateStartControls() {
   ui.deviceButtons.forEach((button) => button.classList.toggle("active", button.dataset.device === gameState.device));
   ui.levelButtons.forEach((button) => button.classList.toggle("active", button.dataset.level === gameState.level));
   if (ui.touchControls) ui.touchControls.hidden = !(gameState.mode === "game" && gameState.started && gameState.device === "phone" && !gameState.over);
+  if (ui.viewActions) ui.viewActions.hidden = gameState.mode !== "view";
   if (ui.hint) {
     if (gameState.mode === "view") ui.hint.textContent = "view mode: tap aquarium to feed";
     else if (!gameState.started) ui.hint.textContent = "Choose device and level, then start or view";
@@ -804,14 +824,15 @@ function drawSeafloor(time) {
     ctx.fill();
   }
 
-  for (let x = 42; x < width; x += 118) drawSeaweed(x, floorTop + 10, time, 34 + (x % 43));
-  for (let x = 88; x < width; x += 176) drawCoral(x, floorTop + 20, 18 + (x % 31));
-  for (let x = 150; x < width; x += 240) drawBranchCoral(x, floorTop + 18, 24 + (x % 27));
+  const scale = entityScale();
+  for (let x = 42; x < width; x += 118) drawSeaweed(x, floorTop + 10, time, (34 + (x % 43)) * scale);
+  for (let x = 88; x < width; x += 176) drawCoral(x, floorTop + 20, (18 + (x % 31)) * scale);
+  for (let x = 150; x < width; x += 240) drawBranchCoral(x, floorTop + 18, (24 + (x % 27)) * scale);
 }
 
 function drawSeaweed(x, baseY, time, heightScale) {
   ctx.strokeStyle = "rgba(92, 219, 152, 0.72)";
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 4 * entityScale();
   ctx.lineCap = "round";
   for (let i = 0; i < 4; i += 1) {
     const offset = (i - 1.5) * 8;
@@ -826,7 +847,7 @@ function drawSeaweed(x, baseY, time, heightScale) {
 function drawCoral(x, baseY, size) {
   ctx.fillStyle = "rgba(255, 116, 132, 0.86)";
   ctx.strokeStyle = "rgba(255, 190, 174, 0.72)";
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 3 * entityScale();
   ctx.lineCap = "round";
   for (let i = 0; i < 6; i += 1) {
     const angle = -Math.PI / 2 + (i - 2.5) * 0.28;
@@ -845,7 +866,7 @@ function drawCoral(x, baseY, size) {
 
 function drawBranchCoral(x, baseY, size) {
   ctx.strokeStyle = "rgba(143, 214, 255, 0.68)";
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 4 * entityScale();
   ctx.lineCap = "round";
   const branches = [0, -0.55, 0.55, -0.92, 0.92];
   for (const angleOffset of branches) {
@@ -1160,6 +1181,7 @@ function drawDiver() {
   const kick = Math.sin(diver.timer * 0.14) * 8;
   ctx.save();
   ctx.translate(diver.x, diver.y);
+  ctx.scale(entityScale(), entityScale());
   ctx.rotate(Math.sin(diver.timer * 0.03) * 0.08);
   ctx.lineCap = "round";
 
@@ -1227,7 +1249,7 @@ function updateShark() {
     const dy = target.y - shark.y;
     const distance = Math.hypot(dx, dy) || 1;
     const level = difficultyLevels[gameState.level];
-    const chaseBoost = diver.active ? level.chaseBoost : shark.chasePower;
+    const chaseBoost = diver.active ? level.chaseBoost * sharkMovementScale() : shark.chasePower;
     shark.vx += (dx / distance) * chaseBoost;
     shark.vy += (dy / distance) * chaseBoost;
   } else {
@@ -1236,7 +1258,7 @@ function updateShark() {
   }
 
   const level = difficultyLevels[gameState.level];
-  const maxSpeed = diver.active ? level.sharkMax : 3.2 + shark.speedMood * 2.4 + Math.min(shark.hunger, 1.6);
+  const maxSpeed = (diver.active ? level.sharkMax : 3.2 + shark.speedMood * 2.4 + Math.min(shark.hunger, 1.6)) * sharkMovementScale();
   limitSpeed(shark, maxSpeed);
   shark.x += shark.vx;
   shark.y += shark.vy;
@@ -1446,7 +1468,12 @@ function drawPointer() {
 }
 
 function loop(time) {
-  const delta = time - lastTime;
+  const delta = time - lastUpdateTime;
+  if (delta < 1000 / 64) {
+    requestAnimationFrame(loop);
+    return;
+  }
+  lastUpdateTime = time;
   lastTime = time;
   fpsSmoother = fpsSmoother * 0.92 + (1000 / Math.max(delta, 1)) * 0.08;
   ui.fps.textContent = Math.round(fpsSmoother);
@@ -1551,7 +1578,9 @@ ui.levelButtons.forEach((button) => {
   });
 });
 if (ui.start) ui.start.addEventListener("click", startGame);
+if (ui.viewStart) ui.viewStart.addEventListener("click", startGame);
 if (ui.view) ui.view.addEventListener("click", startViewMode);
+if (ui.setup) ui.setup.addEventListener("click", () => reset(true));
 function updateJoystick(event) {
   if (!ui.joystickBase || !ui.joystickKnob) return;
   const rect = ui.joystickBase.getBoundingClientRect();
@@ -1605,82 +1634,4 @@ connectSettingPersistence();
 resize();
 reset();
 requestAnimationFrame(loop);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
