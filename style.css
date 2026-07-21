@@ -118,8 +118,10 @@ h1 {
 .resultScore {
   display: grid;
   width: min(980px, 96vw);
+  max-width: 96vw;
+  overflow: hidden;
   gap: clamp(14px, 2.4vw, 24px);
-  padding: clamp(30px, 6vw, 72px) clamp(24px, 6vw, 76px);
+  padding: clamp(26px, 4.8vw, 56px) clamp(20px, 4.4vw, 58px);
   border: 5px solid rgba(255, 246, 250, 0.96);
   border-radius: 8px;
   background:
@@ -142,9 +144,13 @@ h1 {
 .resultScore strong {
   display: block;
   color: #fff66f;
-  font-size: clamp(150px, 31vw, 380px);
+  max-width: 100%;
+  font-size: min(22vw, 220px);
   font-weight: 950;
-  line-height: 0.74;
+  line-height: 0.86;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
   -webkit-text-stroke: clamp(2px, 0.55vw, 7px) #fff;
   text-shadow:
     0 10px 0 #ff52b8,
@@ -183,7 +189,7 @@ h1 {
 
 .resultScore.record strong {
   color: #fff;
-  font-size: clamp(170px, 34vw, 420px);
+  font-size: min(24vw, 250px);
   text-shadow:
     0 10px 0 #ff52b8,
     0 20px 0 rgba(255, 246, 110, 0.92),
@@ -778,6 +784,7 @@ input[type="range"] {
     top: max(12px, env(safe-area-inset-top));
   }
 }
+
 
 
 

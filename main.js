@@ -1546,7 +1546,11 @@ function survivalSeconds() {
 }
 
 function formatSeconds(seconds) {
-  return `${seconds.toFixed(1)}s`;
+  const safeSeconds = Math.max(0, seconds);
+  const minutes = Math.floor(safeSeconds / 60);
+  const wholeSeconds = Math.floor(safeSeconds % 60);
+  const tenths = Math.floor((safeSeconds % 1) * 10);
+  return `${String(minutes).padStart(2, "0")}:${String(wholeSeconds).padStart(2, "0")}.${tenths}`;
 }
 
 function readBestScore() {
@@ -1882,6 +1886,7 @@ connectSettingPersistence();
 resize();
 reset();
 requestAnimationFrame(loop);
+
 
 
 
