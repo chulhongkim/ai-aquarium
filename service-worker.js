@@ -1,10 +1,10 @@
-﻿const CACHE_NAME = "ai-aquarium-v6";
+﻿const CACHE_NAME = "ai-aquarium-v7";
 const ASSETS = [
   "./",
   "./index.html",
-  "./style.css?v=6",
-  "./main.js?v=6",
-  "./manifest.webmanifest?v=6",
+  "./style.css?v=7",
+  "./main.js?v=7",
+  "./manifest.webmanifest?v=7",
   "./icon.svg",
   "./icon-180.png",
   "./icon-512.png",
@@ -26,7 +26,11 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  const url = new URL(event.request.url);
+  const isFreshAsset = url.pathname.endsWith("/") || url.pathname.endsWith(".html") || url.pathname.endsWith(".css") || url.pathname.endsWith(".js");
+  if (isFreshAsset) {
+    event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+    return;
+  }
   event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
 });
-
-
