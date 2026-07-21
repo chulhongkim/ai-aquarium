@@ -1,10 +1,10 @@
-﻿const CACHE_NAME = "ai-aquarium-v4";
+﻿const CACHE_NAME = "ai-aquarium-v5";
 const ASSETS = [
   "./",
   "./index.html",
-  "./style.css",
-  "./main.js",
-  "./manifest.webmanifest",
+  "./style.css?v=5",
+  "./main.js?v=5",
+  "./manifest.webmanifest?v=5",
   "./icon.svg",
   "./icon-180.png",
   "./icon-512.png",
