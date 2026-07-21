@@ -90,8 +90,10 @@ h1 {
   inset: 0;
   z-index: 5;
   display: grid;
-  place-content: center;
+  place-items: center;
   gap: 22px;
+  overflow: auto;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   background: rgba(3, 15, 18, 0.62);
   text-align: center;
 }
@@ -101,13 +103,27 @@ h1 {
   display: none;
 }
 
+.startMenu {
+  display: grid;
+  width: min(720px, 100%);
+  max-height: 100%;
+  gap: 18px;
+  justify-items: center;
+}
+
 .startTitle,
 .resultTitle {
   color: #fff36d;
-  font-size: clamp(48px, 9vw, 112px);
+  font-size: clamp(34px, 8vw, 96px);
   font-weight: 950;
   line-height: 0.9;
   text-shadow: 0 4px 0 rgba(5, 38, 42, 0.9), 0 0 28px rgba(255, 243, 109, 0.55);
+}
+
+.choiceGrid {
+  display: grid;
+  width: 100%;
+  gap: 16px;
 }
 
 .choiceGroup {
@@ -124,7 +140,8 @@ h1 {
 }
 
 .deviceButtons,
-.levelButtons {
+.levelButtons,
+.actionButtons {
   display: flex;
   justify-content: center;
   gap: 12px;
@@ -134,12 +151,24 @@ h1 {
 .deviceBtn,
 .levelBtn,
 #startBtn,
+#viewBtn,
 #playAgainBtn {
   min-width: 132px;
   height: 48px;
   justify-self: center;
   padding: 0 24px;
   font-size: 17px;
+}
+
+.actionButtons {
+  border-top: 1px solid rgba(190, 239, 231, 0.18);
+  width: min(440px, 100%);
+  padding-top: 16px;
+}
+
+#viewBtn {
+  background: rgba(216, 251, 243, 0.14);
+  color: #d8fbf3;
 }
 
 
@@ -389,21 +418,60 @@ input[type="range"] {
     height: 52px;
   }
 }
+@media (orientation: landscape) and (max-height: 560px) {
+  canvas {
+    height: 100vh;
+  }
 
+  .startOverlay,
+  .resultOverlay {
+    align-items: start;
+  }
 
+  .startMenu {
+    width: min(760px, 100%);
+    gap: 12px;
+  }
 
+  .startTitle {
+    font-size: clamp(30px, 9vh, 56px);
+  }
 
+  .choiceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
 
+  .deviceBtn,
+  .levelBtn,
+  #startBtn,
+  #viewBtn,
+  #playAgainBtn {
+    min-width: 118px;
+    height: 42px;
+    padding: 0 16px;
+    font-size: 14px;
+  }
 
+  .actionButtons {
+    padding-top: 12px;
+  }
 
+  .hint {
+    bottom: 12px;
+  }
 
+  .touchControls {
+    right: 16px;
+    bottom: 16px;
+    width: 116px;
+    height: 116px;
+  }
 
-
-
-
-
-
-
-
+  .joystickKnob {
+    width: 46px;
+    height: 46px;
+  }
+}
 
 

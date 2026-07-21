@@ -30,6 +30,7 @@ const ui = {
   deviceButtons: document.querySelectorAll(".deviceBtn"),
   levelButtons: document.querySelectorAll(".levelBtn"),
   start: document.querySelector("#startBtn"),
+  view: document.querySelector("#viewBtn"),
   touchControls: document.querySelector("#touchControls"),
   joystickBase: document.querySelector("#joystickBase"),
   joystickKnob: document.querySelector("#joystickKnob"),
@@ -53,7 +54,7 @@ const difficultyLevels = {
   middle: { label: "Normal", chaseBoost: 0.58, sharkMax: 11.8, diverBite: 1.3, fishBite: 1 },
   advanced: { label: "Advanced", chaseBoost: 0.74, sharkMax: 14.2, diverBite: 1.55, fishBite: 1.14 },
 };
-const gameState = { started: false, over: false, result: null, level: "middle", device: "pc" };
+const gameState = { started: false, over: false, result: null, level: "middle", device: "pc", mode: "game" };
 const winMessage = { active: false, timer: 0 };
 const shark = { x: 0, y: 0, vx: 2.4, vy: 0.2, size: 34, wiggle: 0, hunger: 0, fullness: 0, speedMood: 1, chasePower: 0.11 };
 const SETTINGS_KEY = "ai-aquarium-slider-settings";
@@ -397,6 +398,7 @@ function randomizeSharkSpeed() {
 }
 
 function reset(showStart = true) {
+  if (showStart) gameState.mode = "game";
   fish.length = 0;
   food.length = 0;
   plantFood.length = 0;
@@ -414,7 +416,7 @@ function reset(showStart = true) {
   diver.survivalTimer = 0;
   diver.entered = false;
   for (const key of Object.keys(keys)) keys[key] = false;
-  gameState.started = !showStart;
+  gameState.started = !showStart && gameState.mode === "game";
   gameState.over = false;
   gameState.result = null;
   stopAquariumBgm();
@@ -435,16 +437,25 @@ function reset(showStart = true) {
 function updateStartControls() {
   ui.deviceButtons.forEach((button) => button.classList.toggle("active", button.dataset.device === gameState.device));
   ui.levelButtons.forEach((button) => button.classList.toggle("active", button.dataset.level === gameState.level));
-  if (ui.touchControls) ui.touchControls.hidden = !(gameState.started && gameState.device === "phone" && !gameState.over);
+  if (ui.touchControls) ui.touchControls.hidden = !(gameState.mode === "game" && gameState.started && gameState.device === "phone" && !gameState.over);
   if (ui.hint) {
-    if (!gameState.started) ui.hint.textContent = "Choose a device and level to start";
+    if (gameState.mode === "view") ui.hint.textContent = "view mode: tap aquarium to feed";
+    else if (!gameState.started) ui.hint.textContent = "Choose device and level, then start or view";
     else if (gameState.device === "phone") ui.hint.textContent = "slide joystick: diver / tap aquarium: feed";
     else ui.hint.textContent = "arrow keys: diver / click: feed";
   }
 }
-
 function startGame() {
+  gameState.mode = "game";
   reset(false);
+  updateStartControls();
+  startAquariumBgm();
+}
+
+function startViewMode() {
+  gameState.mode = "view";
+  reset(false);
+  if (ui.startOverlay) ui.startOverlay.hidden = true;
   updateStartControls();
   startAquariumBgm();
 }
@@ -1369,6 +1380,7 @@ function updateWinMessage() {
 }
 
 function drawGameTimer() {
+  if (gameState.mode === "view") return;
   const totalFrames = 1200;
   let label = gameState.started ? "DIVER IN 5" : "SELECT LEVEL";
   let seconds = null;
@@ -1539,6 +1551,7 @@ ui.levelButtons.forEach((button) => {
   });
 });
 if (ui.start) ui.start.addEventListener("click", startGame);
+if (ui.view) ui.view.addEventListener("click", startViewMode);
 function updateJoystick(event) {
   if (!ui.joystickBase || !ui.joystickKnob) return;
   const rect = ui.joystickBase.getBoundingClientRect();
@@ -1592,6 +1605,12 @@ connectSettingPersistence();
 resize();
 reset();
 requestAnimationFrame(loop);
+
+
+
+
+
+
 
 
 

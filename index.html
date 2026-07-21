@@ -28,23 +28,30 @@
         </div>
         <div id="hint" class="hint">Choose a device and level to start</div>
         <div id="startOverlay" class="startOverlay">
-          <div class="startTitle">PLAY SETUP</div>
-          <div class="choiceGroup">
-            <div class="choiceLabel">Device</div>
-            <div class="deviceButtons" aria-label="play device">
-              <button class="deviceBtn" type="button" data-device="phone">Play on Phone</button>
-              <button class="deviceBtn" type="button" data-device="pc">Play on PC</button>
+          <div class="startMenu">
+            <div class="startTitle">PLAY SETUP</div>
+            <div class="choiceGrid">
+              <div class="choiceGroup">
+                <div class="choiceLabel">Device</div>
+                <div class="deviceButtons" aria-label="play device">
+                  <button class="deviceBtn" type="button" data-device="phone">Play on Phone</button>
+                  <button class="deviceBtn" type="button" data-device="pc">Play on PC</button>
+                </div>
+              </div>
+              <div class="choiceGroup">
+                <div class="choiceLabel">Level</div>
+                <div class="levelButtons" aria-label="difficulty level">
+                  <button class="levelBtn" type="button" data-level="beginner">Beginner</button>
+                  <button class="levelBtn" type="button" data-level="middle">Normal</button>
+                  <button class="levelBtn" type="button" data-level="advanced">Advanced</button>
+                </div>
+              </div>
+            </div>
+            <div class="actionButtons" aria-label="start actions">
+              <button id="startBtn" type="button">Start Game</button>
+              <button id="viewBtn" type="button">View Mode</button>
             </div>
           </div>
-          <div class="choiceGroup">
-            <div class="choiceLabel">Level</div>
-            <div class="levelButtons" aria-label="difficulty level">
-              <button class="levelBtn" type="button" data-level="beginner">Beginner</button>
-              <button class="levelBtn" type="button" data-level="middle">Normal</button>
-              <button class="levelBtn" type="button" data-level="advanced">Advanced</button>
-            </div>
-          </div>
-          <button id="startBtn" type="button">Start Game</button>
         </div>
         <div id="touchControls" class="touchControls" hidden aria-label="diver joystick">
           <div id="joystickBase" class="joystickBase" role="application" aria-label="Slide to move the diver">
@@ -132,6 +139,7 @@
     </script>
   </body>
 </html>
+
 
 
 
